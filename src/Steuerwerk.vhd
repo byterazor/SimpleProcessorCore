@@ -33,7 +33,7 @@ end Steuerwerk;
 
 architecture arch of Steuerwerk is
 
-type STATES	is (load, decode, exshl, exshr, exsto, exloa, exadd, exsub, exaddc, exsubc, 
+type STATES	is (load, decode, exshl, exshr, exsto, exloa, exli, exadd, exsub, exaddc, exsubc, 
 					exopor, exopand, exopxor, exopnot, exjpz, exjpc, exjmp, exhlt);
 
 signal sState, sState_next	:	STATES;
@@ -64,6 +64,7 @@ begin
 							when shr	=>		sState_next <= exshr;
 							when sto	=>  	sState_next <= exsto;
 							when loa	=>		sState_next <= exloa;
+							when li     =>      sState_next <= exli;
 							when add	=>  	sState_next <= exadd;
 							when sub	=>  	sState_next <= exsub;
 							when addc =>  	sState_next <= exaddc;

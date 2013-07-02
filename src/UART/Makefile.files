@@ -1,0 +1,14 @@
+ifeq ($(FPGA_FAMILY),spartan6)
+	VHDL_SRC	+= FifoS6.vhd
+else
+ifeq ($(FPGA_FAMILY),spartan3e)
+	VHDL_SRC        += FifoS3e.vhd
+else
+	VHDL_SRC	+= Fifo.vhd
+endif
+endif
+
+
+VHDL_SRC	+= Receiver.vhd ReceiverAndFifo.vhd Sender.vhd SenderAndFifo.vhd UART.vhd          
+VHDL_PKG        +=
+VHDL_TB		+=

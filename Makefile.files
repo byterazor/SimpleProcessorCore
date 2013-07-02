@@ -1,4 +1,4 @@
-VHDL_SRC	+= src/simpleSOC.vhd
-VHDL_SRC	+= General/ClkEnable.vhd General/clkDivider.vhd
-VHDL_PKG   	+=  
-VHDL_TB		+= src/TB/TBsmallTop.vhd
+VHDL_PKG   	+= src/cpupkg.vhd
+VHDL_TB		+= src/Rechner.vhd
+VHDL_SRC	+= src/RegFile.vhd src/CPU.vhd src/MemInterface.vhd src/antibeat_device.vhd src/FetchDecode.vhd src/ALU.vhd src/RAM.vhd 
+VHDL_SRC	+= src/SOC.vhd src/Steuerwerk.vhd

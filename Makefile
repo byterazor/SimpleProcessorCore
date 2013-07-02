@@ -3,7 +3,7 @@ include .config
 MAKEFILES_PATH=/home/dmeyer/Programmieren/Make/Makefiles/
 
 #which FPGA are we synthesizing for ?
-FPGA=xc5vlx110t-1-ff1136
+FPGA=xc5vlx110t-3-ff1136
 
 #NR of the FPGA in jtag chain
 DEVICE_NR=5
@@ -11,8 +11,8 @@ DEVICE_NR=5
 SD= NGC/
 
 #which is the TOP Module of the project ?
-TOP=HSU_MIPS_SOC
-UCF=UCF/xc5vlx110t-1-ff1136.ucf
+TOP=SOC
+UCF=UCF/xc5vlx110t-3-ff1136.ucf
 
 #is this a partial reconfiguration project 
 RECONFIGURATION=0

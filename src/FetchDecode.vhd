@@ -58,7 +58,7 @@ architecture Behavioral of FetchDecode is
 	signal scOp, scOp_next 		: OPTYPE;
 	
 begin
-	Transition: process(idData, icLoadInstr, icJump, icNextPC, sdAdr, sdPC, scOp)
+	Transition: process(idData, sdImmidate, icLoadInstr, icJump, icNextPC, sdAdr, sdPC, scOp)
 	begin
 		-- defaults
 		sdAdr_next <= sdAdr;
