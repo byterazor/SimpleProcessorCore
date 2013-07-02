@@ -1,0 +1,1 @@
+Modules += UART src/mipsCore src/bramMem src/uart4prhs

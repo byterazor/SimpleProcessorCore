@@ -1,0 +1,4 @@
+VHDL_SRC	+= src/simpleSOC.vhd
+VHDL_SRC	+= General/ClkEnable.vhd General/clkDivider.vhd
+VHDL_PKG   	+=  
+VHDL_TB		+= src/TB/TBsmallTop.vhd
