@@ -34,8 +34,8 @@ component antibeat_device is
 end component antibeat_device;
 
 
-signal data_print_1	: std_logic_vector(15 downto 0);		
-signal data_print_2	: std_logic_vector(15 downto 0);
+signal data_print_1	: std_logic_vector(31 downto 0);		
+signal data_print_2	: std_logic_vector(31 downto 0);
 signal sig_entprellt	: std_logic;
 
 signal output : std_logic_vector(15 downto 0);   
@@ -47,8 +47,8 @@ begin
 		   output(15 downto 8) when switch(0)='1' else
 		   output(7 downto 0);
 		   
-	output <= data_print_1 when switch(1) = '0' else
-				 data_print_2;
+	output <= data_print_1(15 downto 0) when switch(1) = '0' else
+				 data_print_2(15 downto 0);
 	
 	antibeat: antibeat_device
 	port map(

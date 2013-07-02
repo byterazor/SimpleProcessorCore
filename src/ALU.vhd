@@ -48,7 +48,7 @@ entity ALU is
 end ALU;
 
 architecture Behavioral of ALU is
-	signal sdTempResult, sdOp1, sdOp2 : std_logic_vector(16 downto 0);
+	signal sdTempResult, sdOp1, sdOp2 : std_logic_vector(32 downto 0);
 begin
 	sdOp1 <= '0' & idOperand1;
 	sdOp2 <= '0' & idOperand2;
@@ -56,10 +56,10 @@ begin
 	process (sdOp1, sdOp2, idCarryIn, icOperation, idImmidiate)
 	begin
 		if (icOperation = shl) then
-			sdTempResult <= sdOp1(15 downto 0) & "0"; 
+			sdTempResult <= sdOp1(31 downto 0) & "0"; 
 			
 		elsif (icOperation = shr) then
-			sdTempResult <= sdOp1(0) & "0" & sdOp1(15 downto 1);
+			sdTempResult <= sdOp1(0) & "0" & sdOp1(31 downto 1);
 	
 		elsif (icOperation = sto) then
 			sdTempResult <= (others => '-');
@@ -107,9 +107,9 @@ begin
 		end if;
 	end process;
 	
-	odResult 	<= sdTempResult(15 downto 0);
-	odCarryOut	<= sdTempResult(16);
-	odZeroOut	<= '1' when sdTempResult(15 downto 0) = "0000000000000000" else
+	odResult 	<= sdTempResult(31 downto 0);
+	odCarryOut	<= sdTempResult(32);
+	odZeroOut	<= '1' when sdTempResult(31 downto 0) = 0 else
 						'0';
 
 end Behavioral;

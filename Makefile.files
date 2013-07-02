@@ -1,4 +1,4 @@
 VHDL_PKG   	+= src/cpupkg.vhd
-VHDL_TB		+= src/Rechner.vhd
+VHDL_TB		+= src/TBRechner.vhd
 VHDL_SRC	+= src/RegFile.vhd src/CPU.vhd src/MemInterface.vhd src/antibeat_device.vhd src/FetchDecode.vhd src/ALU.vhd src/RAM.vhd 
-VHDL_SRC	+= src/SOC.vhd src/Steuerwerk.vhd
+VHDL_SRC	+= src/SOC.vhd src/Steuerwerk.vhd src/Rechner.vhd

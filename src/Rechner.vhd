@@ -14,8 +14,8 @@ end Rechner;
 
 architecture Struktur of Rechner is
 
-	signal DATAbus	: std_logic_vector(15 downto 0);		-- DATAbus
-	signal address	: std_logic_vector(11 downto 0);		-- Adressbus
+	signal DATAbus	: std_logic_vector(31 downto 0);		-- DATAbus
+	signal address	: std_logic_vector(15 downto 0);		-- Adressbus
 	signal rw_ram	: std_logic;								-- read/write-Signal RAM
 	signal enable 	: std_logic;
 	 
@@ -24,7 +24,7 @@ architecture Struktur of Rechner is
 			iClk			:	in		std_logic;
 			iReset		:	in 	std_logic;
 			bdData		:	inout	DATA;		--! connection to databus
-			odAddress   :	out	std_logic_vector(11 downto 0);		--! connection to addressbus
+			odAddress   :	out	std_logic_vector(15 downto 0);		--! connection to addressbus
 			ocEnable		:	out 	std_logic;		--! enable or disable RAM
 			ocRnotW		:	out	std_logic		--! read/write control
 		);
@@ -35,7 +35,7 @@ architecture Struktur of Rechner is
 			iClk			:	in		std_logic;
 			iReset		:	in 	std_logic;
 			bdData		:	inout	DATA;		--! connection to databus
-			idAddress   :	in		std_logic_vector(11 downto 0);		--! connection to addressbus
+			idAddress   :	in		std_logic_vector(15 downto 0);		--! connection to addressbus
 			icEnable		:	in 	std_logic;		--! enable or disable RAM
 			icRnotW		:	in		std_logic		--! read/write control
 			
@@ -63,6 +63,6 @@ begin
 								icRnotW 		=> rw_ram);
 
 	data_print_1 <= DATAbus;	-- Ausgabe des DATAbus auf dem LCD-Display
-	data_print_2 <= "0000" & address;
+	data_print_2 <= "0000000000000000" & address;
 
 end Struktur;

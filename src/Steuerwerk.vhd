@@ -154,6 +154,15 @@ begin
 						ocNextPC		<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '0';	-- no ocJump 
+		
+		when exli    =>
+                        ocRnotWRam  <= '0'; -- read from RAM
+                        ocLoadEn    <= '1'; -- save result
+                        ocEnableRAM <= '0'; -- do not put akku on databus
+                        ocLoadInstr <= '0'; -- do not load instruction
+                        ocNextPC    <= '0'; -- increment pc
+                        ocAddrSel   <= '0'; -- no pc on addressbus
+                        ocJump      <= '0'; -- no ocJump 
 									
 		when exadd	=>
 						ocRnotWRam 	<= '1';	-- read from RAM

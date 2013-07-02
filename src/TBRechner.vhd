@@ -43,8 +43,8 @@ ARCHITECTURE behavior OF TBRechner IS
     PORT(
          clk : IN  std_logic;
          reset : IN  std_logic;
-         data_print_1 : OUT  std_logic_vector(15 downto 0);
-			data_print_2 : OUT  std_logic_vector(15 downto 0)
+         data_print_1 : OUT  std_logic_vector(31 downto 0);
+			data_print_2 : OUT  std_logic_vector(31 downto 0)
         );
     END COMPONENT;
     
@@ -52,8 +52,8 @@ ARCHITECTURE behavior OF TBRechner IS
    --Inputs
    signal clk : std_logic := '0';
    signal reset : std_logic := '1';
-	signal data_print_1 : std_logic_vector(15 downto 0);
-	signal data_print_2 : std_logic_vector(15 downto 0);
+	signal data_print_1 : std_logic_vector(31 downto 0);
+	signal data_print_2 : std_logic_vector(31 downto 0);
 
    -- Clock period definitions
    constant clk_period : time := 10 ns;

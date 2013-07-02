@@ -65,28 +65,29 @@ begin
 		sdPC_next  <= sdPC;
 		scOp_next  <= scOp;
 	    sdImmidiate_next   <= sdImmidate;
-	    
+    
+        --! ISA Definition	    
 		if (icLoadInstr = '1') then
-			sdAdr_next <= idData(11 downto 0);
-			sdImmidiate_next <= "0000" & idData(11 downto 0);
+			sdAdr_next <= idData(15 downto 0);
+			sdImmidiate_next <= "0000000000000000" & idData(15 downto 0);
 			
-			case idData(15 downto 12) is
-				when "0000" => scOp_next <= shl;
-				when "0001" => scOp_next <= shr; 
-				when "0010"	=> scOp_next <= sto; 
-				when "0011"	=> scOp_next <= loa; 
-				when "0100"	=> scOp_next <= add; 
-				when "0101"	=> scOp_next <= sub; 
-				when "0110"	=> scOp_next <= addc; 
-				when "0111"	=> scOp_next <= subc; 
-				when "1000"	=> scOp_next <= opor; 
-				when "1001"	=> scOp_next <= opand; 
-				when "1010"	=> scOp_next <= opxor; 
-				when "1011"	=> scOp_next <= opnot; 
-				when "1100"	=> scOp_next <= jpz;
-				when "1101"	=> scOp_next <= jpc;
-				when "1110"	=> scOp_next <= jmp; 
-				when "1111" => scOP_next <= li;
+			case idData(31 downto 26) is
+				when "000000" => scOp_next <= shl;
+				when "000001" => scOp_next <= shr; 
+				when "000010"	=> scOp_next <= sto; 
+				when "000011"	=> scOp_next <= loa; 
+				when "000100"	=> scOp_next <= add; 
+				when "000101"	=> scOp_next <= sub; 
+				when "000110"	=> scOp_next <= addc; 
+				when "000111"	=> scOp_next <= subc; 
+				when "001000"	=> scOp_next <= opor; 
+				when "001001"	=> scOp_next <= opand; 
+				when "001010"	=> scOp_next <= opxor; 
+				when "001011"	=> scOp_next <= opnot; 
+				when "001100"	=> scOp_next <= jpz;
+				when "001101"	=> scOp_next <= jpc;
+				when "001110"	=> scOp_next <= jmp; 
+				when "001111" => scOP_next <= li;
 				when others	=> scOp_next <= hlt;
 			end case;
 		end if;
@@ -128,6 +129,7 @@ begin
 						
 	ocOperation <= scOp when icLoadInstr = '0' else
 						scOp_next;				
-
+    
+    odImmidiate <= sdImmidate when icLoadInstr = '0' else sdImmidiate_next;
 end Behavioral;
 
