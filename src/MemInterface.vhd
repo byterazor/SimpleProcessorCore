@@ -52,7 +52,7 @@ architecture Behavioral of MemInterface is
 begin
 
 	ocRnotW		<= icBusCtrlCPU;
-	odAddress	<= idAddressCPU;
+	odAddress	<= idAddressCPU when icRAMEnable='1' else (others=>'0');
 	ocEnable		<= icRAMEnable;
 	
 	odDataOutCPU <= bdDataBus;

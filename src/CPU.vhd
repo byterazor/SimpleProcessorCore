@@ -63,18 +63,25 @@ architecture Behavioral of CPU is
 	
 	component RegFile is
 	Port(
-		iClk			: in  std_logic;
-		iReset		: in  std_logic;
-	
-		idDataIn		: in  DATA;
-		idCarryIn	: in  std_logic;
-		idZeroIn		: in  std_logic;
-	
-		icLoadEn		: in std_logic;
-		
-		odDataOut	: out DATA;
-		odCarryOut	: out std_logic;
-		odZeroOut	: out	std_logic
+		iClk          : in  std_logic;
+        iReset          : in  std_logic;
+           
+        icRegAsel       : in  std_logic_vector(4 downto 0);  
+        icRegBsel       : in  std_logic_vector(4 downto 0);
+        odRegA          : out DATA;
+        odRegB          : out DATA;
+        
+        
+        icRegINsel      : in  std_logic_vector(4 downto 0);
+        
+        idDataIn        : in  DATA;
+        idCarryIn   : in  std_logic;
+        idZeroIn        : in  std_logic;
+    
+        icLoadEn        : in std_logic;
+        
+        odCarryOut  : out std_logic;
+        odZeroOut   : out   std_logic
 	);
 	end component;
 	
@@ -95,18 +102,21 @@ architecture Behavioral of CPU is
 	
 	component FetchDecode is
 	Port(
-		iClk			: in  std_logic;
-		iReset		: in  std_logic;
-		
-		idData		: in  DATA;
-		icAddrSel	: in  std_logic;
-		icLoadInstr	: in  std_logic;
-		icJump		: in  std_logic;
-		icNextPC		: in  std_logic;
-		
-		odAddress	: out ADDRESS;
-		odImmidiate : out DATA;
-		ocOperation	: out OPTYPE	
+		iClk          : in  std_logic;
+        iReset      : in  std_logic;
+        
+        idData      : in  DATA;
+        icAddrSel   : in  std_logic;
+        icLoadInstr : in  std_logic;
+        icJump      : in  std_logic;
+        icNextPC        : in  std_logic;
+        
+        odAddress   : out ADDRESS;
+        odImmidiate : out DATA;
+        odRegAsel   : out std_logic_vector(4 downto 0);
+        odRegBsel   : out std_logic_vector(4 downto 0);
+        odRegINsel  : out std_logic_vector(4 downto 0);
+        ocOperation : out OPTYPE
 	);
 	end component;
 	
@@ -125,7 +135,7 @@ architecture Behavioral of CPU is
 		);
 	end component;
 
-	signal scOpCode		: optype;	
+   signal scOpCode		: optype;	
    signal sdCarryRF		: std_logic;
    signal sdZeroRF		: std_logic;	
    signal scRnotWRam		: std_logic;
@@ -135,13 +145,18 @@ architecture Behavioral of CPU is
    signal scNextPC		: std_logic;	
    signal scAddrSel		: std_logic;	
    signal scJump			: std_logic;
-	signal sdAkkuRes		: DATA;
-	signal sdCarryAkku	: std_logic;
+   signal sdAkkuRes		: DATA;
+   signal sdCarryAkku	: std_logic;
    signal sdZeroAkku		: std_logic;	
-	signal sdDataOut		: DATA;
-	signal sdDataIn 		: DATA;
-	signal sdAddress		: ADDRESS;
-    signal sdImmidiate      : DATA;
+   signal sdDataOut		: DATA;
+   signal sdDataIn 		: DATA;
+   signal sdAddress		: ADDRESS;
+   signal sdImmidiate   : DATA;
+   signal sdRegAsel     : std_logic_vector(4 downto 0);
+   signal sdRegBsel     : std_logic_vector(4 downto 0);
+   signal sdRegINsel    : std_logic_vector(4 downto 0);
+   signal sdRegA        : DATA;
+   signal sdRegB        : DATA;
     
 begin
 
@@ -163,21 +178,26 @@ begin
 	RF: RegFile PORT MAP(
 			iClk			=> iClk,
 			iReset		=> iReset,
-		
+		    
+		    icRegAsel   => sdRegAsel,
+		    icRegBsel   => sdRegBsel,
+		    icRegINsel  => sdRegINsel,
+		    
 			idDataIn		=> sdAkkuRes,
 			idCarryIn	=> sdCarryAkku,
 			idZeroIn		=> sdZeroAkku,
 		
 			icLoadEn		=> scLoadEn,
 			
-			odDataOut	=> sdDataOut,
+			odRegA	    => sdRegA,
+			odRegB      => sdRegB,
 			odCarryOut	=> sdCarryRF,
 			odZeroOut	=> sdZeroRF
 	);
 	
 	Calc : ALU Port MAP(
-			idOperand1	=> sdDataOut,
-			idOperand2	=> sdDataIn,
+			idOperand1	=> sdRegA,
+			idOperand2	=> sdRegB,
 			idImmidiate => sdImmidiate,
 			idCarryIn	=> sdCarryRF,
 			
@@ -200,6 +220,9 @@ begin
 			
 			odAddress	=> sdAddress,
 			odImmidiate => sdImmidiate,
+			odRegAsel   => sdRegAsel,
+            odRegBsel   => sdRegBsel,
+            odRegINsel  => sdRegINsel,
 			ocOperation	=> scOpCode
 	);
 	
@@ -212,7 +235,7 @@ begin
 		icBusCtrlCPU	=> scRnotWRam,
 		icRAMEnable		=> scEnableRAM,
 		odDataOutCPU	=> sdDataIn,
-		idDataInCPU		=> sdDataOut,
+		idDataInCPU		=> sdRegA,
 		idAddressCPU	=> sdAddress
 		);
 

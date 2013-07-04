@@ -46,7 +46,11 @@ entity FetchDecode is
 		
 		odAddress	: out ADDRESS;
 		odImmidiate : out DATA;
-		ocOperation	: out OPTYPE	
+		odRegAsel   : out std_logic_vector(4 downto 0);
+		odRegBsel   : out std_logic_vector(4 downto 0);
+		odRegINsel  : out std_logic_vector(4 downto 0);
+		ocOperation	: out OPTYPE
+			
 	);
 end FetchDecode;
 
@@ -55,21 +59,32 @@ architecture Behavioral of FetchDecode is
 	signal sdAdr, sdAdr_next 	: ADDRESS;
 	signal sdImmidate, sdImmidiate_next : DATA;
 	
+	signal sdRegAsel, sdRegAsel_next   :   std_logic_vector(4 downto 0);
+	signal sdRegBsel, sdRegBsel_next   :   std_logic_vector(4 downto 0);
+	signal sdRegINsel, sdRegINsel_next   :   std_logic_vector(4 downto 0);
+	
 	signal scOp, scOp_next 		: OPTYPE;
 	
 begin
-	Transition: process(idData, sdImmidate, icLoadInstr, icJump, icNextPC, sdAdr, sdPC, scOp)
+	Transition: process(idData, sdImmidate, icLoadInstr, icJump, icNextPC, sdAdr, sdPC, scOp, sdRegAsel, sdRegBsel, sdRegINsel)
 	begin
 		-- defaults
 		sdAdr_next <= sdAdr;
 		sdPC_next  <= sdPC;
 		scOp_next  <= scOp;
 	    sdImmidiate_next   <= sdImmidate;
-    
+        
+        sdRegAsel_next  <= sdRegAsel;
+        sdRegBsel_next  <= sdRegBsel;
+        sdRegINsel_next <= sdRegINsel;
+        
         --! ISA Definition	    
 		if (icLoadInstr = '1') then
-			sdAdr_next <= idData(15 downto 0);
+			sdAdr_next <= "0000" & idData(11 downto 0);
 			sdImmidiate_next <= "0000000000000000" & idData(15 downto 0);
+			sdRegINsel_next  <= idData(25 downto 21);
+			sdRegAsel_next   <= idData(20 downto 16);
+			sdRegBsel_next   <= idData(15 downto 11);
 			
 			case idData(31 downto 26) is
 				when "000000" => scOp_next <= shl;
@@ -111,13 +126,20 @@ begin
 			sdPC  <= (others => '0');
 			sdAdr <= (others => '0');
 			sdImmidate   <= (others=>'0');
+			sdRegAsel    <= (others=>'0');
+			sdRegBsel    <= (others=>'0');
+			sdRegINsel   <= (others=>'0');
+			
 			scOp  <= hlt;
-		
+		      
 		elsif (rising_edge(iClk)) then
 			sdPC  <= sdPC_next;
 			sdAdr <= sdAdr_next;
 			scOp  <= scOp_next;
 		    sdImmidate    <= sdImmidiate_next;
+		    sdRegAsel     <= sdRegAsel_next;
+		    sdRegBsel     <= sdRegBsel_next;
+		    sdRegINsel    <= sdRegINsel_next;
 		end if;
 	
 	end process;
@@ -131,5 +153,11 @@ begin
 						scOp_next;				
     
     odImmidiate <= sdImmidate when icLoadInstr = '0' else sdImmidiate_next;
+    
+    odRegAsel   <= sdRegAsel  when icLoadInstr = '0' else sdRegAsel_next;
+    odRegBsel   <= sdRegBsel  when icLoadInstr = '0' else sdRegBsel_next;
+    odRegINsel  <= sdRegINsel when icLoadInstr = '0' else sdRegINsel_next;
+    
+    
 end Behavioral;
 
