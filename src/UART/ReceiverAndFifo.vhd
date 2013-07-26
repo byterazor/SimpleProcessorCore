@@ -22,21 +22,20 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
 entity ReceiverAndFifo is
-   
 	port  (
-		iSysClk 	  : in  std_logic;						--! signal description System side clock
-		ieClkEn       : in  std_logic;
+		iSysClk 	: in  std_logic;						--! signal description System side clock
+		ieClkEn     : in  std_logic;
 		ie4xBaudClkEn : in  std_logic;      				--! signal description UART clock (4xBAUD Rate frequency!)
-		iReset		  : in  std_logic;						--! signal description asynchronous reset
-	    icEnableParity: in  std_logic;                      --! signal description allow reception of parity bit	
-		odDataRcvd	  : out  std_logic_vector(7 downto 0);	--! signal description data from Fifo
-		odParity      : out  std_logic;                       --! possible parity bit
-		ocREmpty	  : out std_logic;						--! signal description indicates that Fifo is empty
-		ocRFull		  : out std_logic;						--! signal description indicates that Fifo is full
-		ocRAlmostE	  : out std_logic;						--! signal description indicates that Fifo is empty to half full
-		ocRAlmostF	  : out std_logic;						--! signal description indicates that Fifo is half full to full
-		icRReadEn	  : in  std_logic;						--! signal description get next value from Fifo (Fifo is in First Word Fall Through Mode!)
-		idReceive	  : in  std_logic							--! signal description signal for the RS232 Tx line
+		iReset		: in  std_logic;						--! signal description asynchronous reset
+		
+		odDataRcvd	: out  std_logic_vector(7 downto 0);	--! signal description data from Fifo
+		ocREmpty	: out std_logic;						--! signal description indicates that Fifo is empty
+		ocRFull		: out std_logic;						--! signal description indicates that Fifo is full
+		ocRAlmostE	: out std_logic;						--! signal description indicates that Fifo is empty to half full
+		ocRAlmostF	: out std_logic;						--! signal description indicates that Fifo is half full to full
+		icRReadEn	: in  std_logic;						--! signal description get next value from Fifo (Fifo is in First Word Fall Through Mode!)
+		
+		idReceive	: in  std_logic							--! signal description signal for the RS232 Tx line
 	);
 end ReceiverAndFifo;
 
@@ -44,14 +43,12 @@ architecture arch of ReceiverAndFifo is
 
 	component Receiver is
 	    port ( 
-	    	iSysClk       : in  std_logic;                    
-            ie4BaudClkEn  : in  std_logic;
-	    	reset 	      : in  STD_LOGIC;
-	        Rx 		      : in  STD_LOGIC;
-	        data 	      : out STD_LOGIC_VECTOR (7 downto 0);
-	        parity        : out std_logic;
-	        icEnableParity: in  std_logic;
-			ready 	      : out STD_LOGIC);
+	    	iSysClk    : in  std_logic;                    
+            ie4BaudClkEn : in  std_logic;
+	    	reset 	: in  STD_LOGIC;
+	        Rx 		: in  STD_LOGIC;
+	        data 	: out STD_LOGIC_VECTOR (7 downto 0);
+			ready 	: out STD_LOGIC);
 	end component;
 	
 	component Fifo is
@@ -64,8 +61,8 @@ architecture arch of ReceiverAndFifo is
 			iClkRead 	: in  std_logic; 
 			icReadEn	: in  std_logic;
 			
-			idDataIn	: in  std_logic_vector(8 downto 0);
-			odDataOut	: out std_logic_vector(8 downto 0);
+			idDataIn	: in  std_logic_vector(7 downto 0);
+			odDataOut	: out std_logic_vector(7 downto 0);
 			
 			ocEmpty		: out std_logic;
 			ocFull		: out std_logic;
@@ -78,8 +75,7 @@ architecture arch of ReceiverAndFifo is
     signal scRWrite         : std_logic;
 	signal scRWriteEn 		: std_logic;
 	signal seRReadEn        : std_logic;
-	signal sdDataRcvd		: STD_LOGIC_VECTOR (8 downto 0);
-	signal sdParity         : std_logic;
+	signal sdDataRcvd		: STD_LOGIC_VECTOR (7 downto 0);
 	
 	signal scRcvrEmpty		: std_logic;
 	signal scRcvrFull		: std_logic;
@@ -105,8 +101,7 @@ begin
 						icReadEn	=> seRReadEn,
 						
 						idDataIn	=> sdDataRcvd,
-						odDataOut(8 downto 1)	=> odDataRcvd,
-					    odDataOut(0)            => odParity,
+						odDataOut	=> odDataRcvd,
 						
 						ocEmpty		=> scRcvrEmpty,
 						ocFull		=> scRcvrFull,
@@ -126,13 +121,10 @@ begin
                             ie4BaudClkEn => ie4xBaudClkEn,
 					    	reset	=> iReset, 
 					        Rx 		=> idReceive,
-					        data 	=> sdDataRcvd(8 downto 1),
-					        parity  => sdDataRcvd(0),
-					        icEnableParity => icEnableParity,
+					        data 	=> sdDataRcvd,
 							ready 	=> scReaderReady
 						);
-	
-	
+						
 	ReceiverCtrl : process (iSysClk)
     begin
         if (rising_edge(iSysClk)) then

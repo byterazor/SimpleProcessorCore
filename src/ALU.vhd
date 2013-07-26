@@ -53,7 +53,7 @@ begin
 	sdOp1 <= '0' & idOperand1;
 	sdOp2 <= '0' & idOperand2;
 
-	process (sdOp1, sdOp2, idCarryIn, icOperation, idImmidiate)
+	process (sdOp1, sdOp2, idCarryIn, icOperation, idImmidiate, idOperand1)
 	begin
 		if (icOperation = shl) then
 			sdTempResult <= sdOp1(31 downto 0) & "0"; 
@@ -65,7 +65,7 @@ begin
 			sdTempResult <= (others => '-');
 		
 		elsif (icOperation = loa) then
-			sdTempResult <= sdOp2;
+			sdTempResult <= '0' & idImmidiate;
 		elsif (icOperation = li) then
 		    sdTempResult <= '0' & idImmidiate;
 		elsif (icOperation = add) then

@@ -39,10 +39,13 @@ ARCHITECTURE behavior OF TBRechner IS
  
     -- Component Declaration for the Unit Under Test (UUT)
  
-    COMPONENT Rechner
+    COMPONENT SOC
     PORT(
          clk : IN  std_logic;
          reset : IN  std_logic;
+         odRS232       :   out std_logic;
+         idRS232       :    in std_logic;
+         ic200MhzClk   :   in  std_logic;
          data_print_1 : OUT  std_logic_vector(31 downto 0);
 			data_print_2 : OUT  std_logic_vector(31 downto 0)
         );
@@ -51,19 +54,24 @@ ARCHITECTURE behavior OF TBRechner IS
 
    --Inputs
    signal clk : std_logic := '0';
-   signal reset : std_logic := '1';
+   signal reset : std_logic := '0';
 	signal data_print_1 : std_logic_vector(31 downto 0);
 	signal data_print_2 : std_logic_vector(31 downto 0);
-
-   -- Clock period definitions
+    
+    signal idRS232, odRS232 :   std_logic;
+    
+       -- Clock period definitions
    constant clk_period : time := 10 ns;
  
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
-   uut: Rechner PORT MAP (
+   uut: SOC PORT MAP (
           clk => clk,
+          ic200MhzClk => clk,
           reset => reset,
+          idRS232   => idRS232,
+          odRS232   => odRS232,
           data_print_1 => data_print_1,
 			 data_print_2 => data_print_2
         );
@@ -84,7 +92,7 @@ BEGIN
       -- hold reset state for 100 ns.
       wait for 100 ns;	
 		
-		reset <= '0';
+		reset <= '1';
 
       wait for clk_period*10;
 

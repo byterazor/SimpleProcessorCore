@@ -6,7 +6,7 @@
 my $nr_instr_bytes = 4;
 my $nr_opcode_bits = 6;
 my $nr_reg_bits    = 5;
-my $startaddr      = 0;
+my $startaddr      = -1;
 
 # mnemonnic to opcode conversion
 my %opcodes = (
@@ -26,6 +26,8 @@ my %opcodes = (
 	'jpc'  => 0x0D,
 	'jmp'  => 0x0E,
 	'lui'  => 0x0F,
+	'jmc'  => 0x10,
+	'ret'  => 0x11,
 	'hlt'  => 0x3F
 );
 
@@ -304,6 +306,14 @@ while ( my $line = <$src> ) {
 	elsif ( $INSTR eq "jpc" ) {
 		$label = $REST;
 	}
+	elsif ( $INSTR eq "jmc" ) {
+		$label = $REST;
+		
+        my $dst = 31;
+        $dst = $dst << 21;
+        $opc = $opc | $dst;
+            
+    }
 	elsif ( $INSTR eq "jmp" ) {
 		$label = $REST;
 	}
@@ -326,6 +336,12 @@ while ( my $line = <$src> ) {
 			  ;
 		}
 	}
+	elsif ( $INSTR eq "ret" ) {
+		my $op1=31;
+        $op1 = $op1 << 16;
+        $opc = $opc | $op1;
+        
+    }
 	elsif ( $INSTR =~ /^(.*):$/ ) {
 		$labels{$1} = $addr;
 		$addr--;
@@ -345,7 +361,10 @@ while ( my $line = <$src> ) {
 		$instruction->{opc}     = $opc;
 		$instruction->{comment} = $line;
 		$instruction->{label}   = $label;
-
+        
+        if ($line =~/jmc/) {
+        	print "-" .$instruction->{label}."-\n";
+        }        
 		push( @instructions, $instruction );
 
 	}

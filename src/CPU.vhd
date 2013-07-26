@@ -57,7 +57,10 @@ architecture Behavioral of CPU is
         ocLoadInstr	:	out	std_logic;	--! load instruction control signal
         ocNextPC		:	out	std_logic;	--! increment pc
         ocAddrSel		:	out	std_logic;	--! pc on addressbus
-        ocJump			:	out	std_logic	--! do a ocJump
+        ocJump			:	out	std_logic;	--! do a ocJump
+        ocPCregister    :   out std_logic;  --! put PC to register File
+        ocUsePC         :   out std_logic;  --! use Register to fill in the PC
+        ocLoad          :   out std_logic   --! put databus to ALU immediate port  
     );
 	end component;
 	
@@ -71,6 +74,8 @@ architecture Behavioral of CPU is
         odRegA          : out DATA;
         odRegB          : out DATA;
         
+        icPC            :  in std_logic;   -- select PC as input to RegisterFile
+        idPC            :  in DATA;
         
         icRegINsel      : in  std_logic_vector(4 downto 0);
         
@@ -110,6 +115,9 @@ architecture Behavioral of CPU is
         icLoadInstr : in  std_logic;
         icJump      : in  std_logic;
         icNextPC        : in  std_logic;
+        idPC        : in  ADDRESS;
+        icUsePC     : in  std_logic;
+        odPC        : out ADDRESS;
         
         odAddress   : out ADDRESS;
         odImmidiate : out DATA;
@@ -134,7 +142,16 @@ architecture Behavioral of CPU is
 		idAddressCPU	: in		ADDRESS		
 		);
 	end component;
-
+    
+   
+   signal sdPC          :   DATA;
+   signal scPCregister  :   std_logic;         
+   
+   signal scUsePC       :   std_logic;
+   signal sdPCfetch     :   ADDRESS;
+   
+   signal scLoad        :   std_logic;
+   
    signal scOpCode		: optype;	
    signal sdCarryRF		: std_logic;
    signal sdZeroRF		: std_logic;	
@@ -148,10 +165,10 @@ architecture Behavioral of CPU is
    signal sdAkkuRes		: DATA;
    signal sdCarryAkku	: std_logic;
    signal sdZeroAkku		: std_logic;	
-   signal sdDataOut		: DATA;
    signal sdDataIn 		: DATA;
    signal sdAddress		: ADDRESS;
    signal sdImmidiate   : DATA;
+   signal sdImmidiateALU: DATA;
    signal sdRegAsel     : std_logic_vector(4 downto 0);
    signal sdRegBsel     : std_logic_vector(4 downto 0);
    signal sdRegINsel    : std_logic_vector(4 downto 0);
@@ -172,7 +189,10 @@ begin
         ocLoadInstr	=> scLoadInstr,
         ocNextPC		=> scNextPC,
         ocAddrSel		=> scAddrSel,
-        ocJump			=> scJump
+        ocJump			=> scJump,
+        ocPCregister    => scPCregister,
+        ocUsePC         => scUsePC,
+        ocLoad          => scLoad
     );
 	 
 	RF: RegFile PORT MAP(
@@ -182,6 +202,9 @@ begin
 		    icRegAsel   => sdRegAsel,
 		    icRegBsel   => sdRegBsel,
 		    icRegINsel  => sdRegINsel,
+		    
+		    icPC        => scPCregister,
+            idPC        => sdPC,
 		    
 			idDataIn		=> sdAkkuRes,
 			idCarryIn	=> sdCarryAkku,
@@ -198,7 +221,7 @@ begin
 	Calc : ALU Port MAP(
 			idOperand1	=> sdRegA,
 			idOperand2	=> sdRegB,
-			idImmidiate => sdImmidiate,
+			idImmidiate => sdImmidiateALU,
 			idCarryIn	=> sdCarryRF,
 			
 			odResult		=> sdAkkuRes,
@@ -208,6 +231,8 @@ begin
 			icOperation	=> scOpCode
 	);
 	
+	
+	sdPC(31 downto 16) <= (others=>'0');
 	FaD : FetchDecode PORT MAP(
 			iClk			=> iClk,
 			iReset		=> iReset,
@@ -216,8 +241,11 @@ begin
 			icAddrSel	=> scAddrSel,
 			icLoadInstr	=> scLoadInstr,
 			icJump		=> scJump,
-			icNextPC		=> scNextPC,
+			icNextPC	=> scNextPC,
 			
+			odPC        => sdPC(15 downto 0),
+			idPC        => sdRegA(15 downto 0),
+            icUsePC     => scUsePC,
 			odAddress	=> sdAddress,
 			odImmidiate => sdImmidiate,
 			odRegAsel   => sdRegAsel,
@@ -239,6 +267,9 @@ begin
 		idAddressCPU	=> sdAddress
 		);
 
-
+    
+    sdImmidiateALU  <= bdData when scLoad='1' else
+                       sdImmidiate;
+    
 end Behavioral;
 

@@ -27,14 +27,17 @@ entity Steuerwerk is
         ocLoadInstr	:	out	std_logic;	--! load instruction control signal
         ocNextPC		:	out	std_logic;	--! increment pc
         ocAddrSel		:	out	std_logic;	--! pc on addressbus
-        ocJump			:	out	std_logic	--! do a ocJump
+        ocJump			:	out	std_logic;	--! do a ocJump
+        ocPCregister    :   out std_logic;  --! put PC to register File
+        ocUsePC         :   out std_logic;   --! use Register to fill in the PC
+        ocLoad          :   out std_logic   --! put databus to ALU immediate port
     );
 end Steuerwerk;
 
 architecture arch of Steuerwerk is
 
 type STATES	is (load, decode, exshl, exshr, exsto, exloa, exli, exadd, exsub, exaddc, exsubc, 
-					exopor, exopand, exopxor, exopnot, exjpz, exjpc, exjmp, exhlt);
+					exopor, exopand, exopxor, exopnot, exjpz, exjpc, exjmp, exhlt, exjmc, exret);
 
 signal sState, sState_next	:	STATES;
 
@@ -84,7 +87,8 @@ begin
 													sState_next <= load;
 												end if;
 							when jmp	=>  	sState_next <= exjmp;
-							
+							when jmc    =>      sState_next <= exjmc;
+							when ret    =>      sState_next <= exret;
 							when hlt	=>  	sState_next <= exhlt;	
 						end case;						
 		when exhlt	=> sState_next <= exhlt;		
@@ -109,6 +113,9 @@ begin
 						ocNextPC		<= '0';	-- do not increment pc
 						ocAddrSel		<= '1';	-- pc on addressbus
 						ocJump			<= '0';	-- no ocJump
+						ocPCregister    <= '0'; -- do not put PC to register File
+						ocUsePC         <= '0';
+						ocLoad          <= '0';
 						
 		when decode	=>
 						ocRnotWRam 		<= '1';	-- read from RAM
@@ -118,6 +125,9 @@ begin
 						ocNextPC		<= '1';	-- do not increment pc
 						ocAddrSel		<= '0';	-- pc on addressbus
 						ocJump			<= '0';	-- no ocJump
+						ocPCregister    <= '0'; -- do not put PC to register File
+						ocUsePC         <= '0';
+						ocLoad          <= '0';
 						
 		when exshl	=>
 						ocRnotWRam 		<= '0';	-- read from RAM
@@ -127,6 +137,9 @@ begin
 						ocNextPC		<= '0';	-- increment pc
 						ocAddrSel		<= '0';	-- no pc on addressbus
 						ocJump			<= '0';	-- no ocJump
+						ocPCregister    <= '0'; -- do not put PC to register File
+						ocUsePC         <= '0';
+						ocLoad          <= '0';
 						
 		when exshr	=>
 						ocRnotWRam 		<= '0';	-- read from RAM
@@ -136,7 +149,10 @@ begin
 						ocNextPC		<= '0';	-- increment pc
 						ocAddrSel		<= '0';	-- no pc on addressbus
 						ocJump			<= '0';	-- no ocJump
-		
+		                ocPCregister    <= '0'; -- do not put PC to register File
+		                ocUsePC         <= '0';
+		                ocLoad          <= '0';
+		                
 		when exsto	=>
 						ocRnotWRam 	<= '0';	-- write to RAM
 						ocLoadEn	<= '0';	-- do not save result
@@ -144,8 +160,11 @@ begin
 						ocLoadInstr <= '0'; -- do not load instruction
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
-						ocJump		<= '0';	-- no ocJump 
-		
+						ocJump		<= '0';	-- no ocJump
+						ocPCregister    <= '0'; -- do not put PC to register File 
+		                ocUsePC         <= '0';
+		                ocLoad          <= '0';
+		                
 		when exloa	=>
 						ocRnotWRam 	<= '1';	-- read from RAM
 						ocLoadEn	<= '1';	-- save result
@@ -154,7 +173,10 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '0';	-- no ocJump 
-		
+						ocPCregister    <= '0'; -- do not put PC to register File
+		                ocUsePC         <= '0';
+		                ocLoad          <= '1';
+		                
 		when exli    =>
                         ocRnotWRam  <= '0'; -- read from RAM
                         ocLoadEn    <= '1'; -- save result
@@ -163,6 +185,9 @@ begin
                         ocNextPC    <= '0'; -- increment pc
                         ocAddrSel   <= '0'; -- no pc on addressbus
                         ocJump      <= '0'; -- no ocJump 
+                        ocPCregister    <= '0'; -- do not put PC to register File
+                        ocUsePC         <= '0';
+						ocLoad          <= '0';
 									
 		when exadd	=>
 						ocRnotWRam 	<= '0';	-- read from RAM
@@ -172,6 +197,9 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '0';	-- no ocJump
+						ocPCregister    <= '0'; -- do not put PC to register File
+						ocUsePC         <= '0';
+						ocLoad          <= '0';
 				
 		when exsub	=>
 						ocRnotWRam 	<= '0';	-- read from RAM
@@ -181,6 +209,9 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '0';	-- no ocJump
+						ocPCregister    <= '0'; -- do not put PC to register File
+						ocUsePC         <= '0';
+						ocLoad          <= '0';
 						
 		when exaddc	=>
 						ocRnotWRam 	<= '0';	-- read from RAM
@@ -190,6 +221,9 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '0';	-- no ocJump
+						ocPCregister    <= '0'; -- do not put PC to register File
+						ocUsePC         <= '0';
+						ocLoad          <= '0';
 				
 		when exsubc	=>
 						ocRnotWRam 	<= '0';	-- read from RAM
@@ -199,6 +233,9 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '0';	-- no ocJump
+						ocPCregister    <= '0'; -- do not put PC to register File
+						ocUsePC         <= '0';
+						ocLoad          <= '0';
 		
 		when exopor	=>
 						ocRnotWRam 	<= '0';	-- read from RAM
@@ -208,7 +245,10 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '0';	-- no ocJump
-		
+						ocPCregister    <= '0'; -- do not put PC to register File
+		                ocUsePC         <= '0';
+		                ocLoad          <= '0';
+		                
 		when exopand => 
 						ocRnotWRam 	<= '0';	-- read from RAM
 						ocLoadEn	<= '1';	-- save result
@@ -217,7 +257,10 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '0';	-- no ocJump						 
-		
+						ocPCregister    <= '0'; -- do not put PC to register File
+		                ocUsePC         <= '0';
+		                ocLoad          <= '0';
+		                
 		when exopxor => 
 						ocRnotWRam 	<= '0';	-- read from RAM
 						ocLoadEn	<= '1';	-- save result
@@ -226,6 +269,9 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '0';	-- no ocJump	
+						ocPCregister    <= '0'; -- do not put PC to register File
+						ocUsePC         <= '0';
+						ocLoad          <= '0';
 						
 		when exopnot => 
 						ocRnotWRam 	<= '0';	-- read from RAM
@@ -235,6 +281,9 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '0';	-- no ocJump
+						ocPCregister    <= '0'; -- do not put PC to register File
+						ocUsePC         <= '0';
+						ocLoad          <= '0';
 						
 		when exjpz	 =>
 						ocRnotWRam 	<= '0';	-- read from RAM
@@ -244,6 +293,9 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '1';	-- ocJump
+						ocPCregister    <= '0'; -- do not put PC to register File
+						ocUsePC         <= '0';
+						ocLoad          <= '0';
 						
 		when exjpc	 =>
 						ocRnotWRam 	<= '0';	-- read from RAM
@@ -253,7 +305,10 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '1';	-- ocJump
-		
+						ocPCregister    <= '0'; -- do not put PC to register File
+		                ocUsePC         <= '0';
+		                ocLoad          <= '0';
+		                
 		when exjmp	=>
 						ocRnotWRam 	<= '0';	-- read from RAM
 						ocLoadEn	<= '0';	-- save result
@@ -262,6 +317,34 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '1';	-- ocJump
+						ocPCregister    <= '0'; -- do not put PC to register File
+		                ocUsePC         <= '0';
+		                ocLoad          <= '0';
+		                
+		when exjmc    =>
+                        ocRnotWRam  <= '0'; -- read from RAM
+                        ocLoadEn    <= '1'; -- save result
+                        ocEnableRAM <= '0'; -- do not put akku on databus
+                        ocLoadInstr <= '0'; -- do not load instruction
+                        ocNextPC    <= '0'; -- increment pc
+                        ocAddrSel   <= '0'; -- no pc on addressbus
+                        ocJump      <= '1'; -- ocJump
+                        ocPCregister<= '1'; -- put PC to register File
+                        ocUsePC         <= '0';
+                        ocLoad          <= '0';
+                         
+		when exret    =>
+                        ocRnotWRam  <= '0'; -- read from RAM
+                        ocLoadEn    <= '0'; -- save result
+                        ocEnableRAM <= '0'; -- do not put akku on databus
+                        ocLoadInstr <= '0'; -- do not load instruction
+                        ocNextPC    <= '0'; -- increment pc
+                        ocAddrSel   <= '0'; -- no pc on addressbus
+                        ocJump      <= '0'; -- ocJump
+                        ocPCregister<= '0'; -- put PC to register File
+						ocUsePC         <= '1';
+						ocLoad          <= '0';
+						
 		when exhlt	=>
 						ocRnotWRam 	<= '0';	-- read from RAM
 						ocLoadEn	<= '0';	-- save result
@@ -270,7 +353,10 @@ begin
 						ocNextPC	<= '0';	-- increment pc
 						ocAddrSel	<= '0';	-- no pc on addressbus
 						ocJump		<= '0';	-- no ocJump
-		
+						ocPCregister    <= '0'; -- do not put PC to register File
+		                ocUsePC         <= '0';
+		                ocLoad          <= '0';
+		                
 		when others => 
 						ocRnotWRam 	<= '-';	-- read from RAM
 						ocLoadEn	<= '-';	-- save result
@@ -279,6 +365,10 @@ begin
 						ocNextPC	<= '-';	-- increment pc
 						ocAddrSel	<= '-';	-- no pc on addressbus
 						ocJump		<= '-';	-- no ocJump
+						ocPCregister    <= '0'; -- do not put PC to register File
+						ocUsePC         <= '0';
+						ocLoad          <= '0';
+						
 	end case;
 
 end process;

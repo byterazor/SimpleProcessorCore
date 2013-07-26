@@ -27,17 +27,15 @@ entity Receiver is
         ie4BaudClkEn : in  std_logic;reset 		: in std_logic;			--! signal description asynchronous reset
         Rx 			: in  STD_LOGIC;		--! signal description signal for the RS232 Rx line
         data 		: out STD_LOGIC_VECTOR (7 downto 0);	--! signal description last data received
-        parity      : out std_logic;                        --! signal description
-        icEnableParity: in std_logic;                       --! signal description Enable reception of the parity bit 
 		ready 		: out STD_LOGIC);		--! '0' signals receving in progress, if '1' after a previous '0' signals data available at <data> 
 end Receiver;
 
 architecture Behavioral of Receiver is
 	signal z, tz : integer range 0 to 63;
 	signal result, tresult : STD_LOGIC_VECTOR(7 downto 0);
-    signal sdParity : std_logic;
+
 begin
-	process (z, Rx, icEnableParity)
+	process (z, Rx)
 	begin
 			if z = 0 then
 				if (Rx ='0') then
@@ -48,8 +46,7 @@ begin
 				
 			elsif z <= 36 then
 				tz <= z + 1;
-			elsif (z <= 40 and icEnableParity='1') then
-			     tz <= z+1;		
+					
 			else
 				tz <= 0;		
 
@@ -58,12 +55,11 @@ begin
 	
 	tresult <= Rx & result(7 downto 1);	
 	
-	process (iSysClk)
+	process (reset, iSysClk)
 	begin
 		if (iSysClk'event and iSysClk = '1') then
 		  if reset = '1' then
             z <= 0;
-            sdParity    <= '0';
           elsif ie4BaudClkEn = '1' then
 			z <= tz;
 			case z is
@@ -91,14 +87,7 @@ begin
 					
 				when 33 =>
 					result <= tresult;		-- D(7)
-				
-				when 37 =>
-				    result  <= result;
-				    if (icEnableParity='1') then
-				        sdParity <= Rx;
-				    else
-				        sdParity <= '0';
-				    end if;	
+					
 				-- optional TODO: add check for STOP-Bit(s) 
 					
 				when others => result <= result;
@@ -106,8 +95,7 @@ begin
 		  end if;
 		end if;
 	end process;
-    
-    parity <= sdParity;
+
 	data <= result;
 	ready <= '1' when z = 0 else '0';
 	

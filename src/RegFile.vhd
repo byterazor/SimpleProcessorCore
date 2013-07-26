@@ -35,6 +35,8 @@ entity RegFile is
 	    odRegA          : out DATA;
 	    odRegB          : out DATA;
 	    
+	    icPC            :  in std_logic;   -- select PC as input to RegisterFile
+	    idPC            :  in DATA;
 	    
 	    icRegINsel      : in  std_logic_vector(4 downto 0);
 		
@@ -76,7 +78,11 @@ begin
 			
 		elsif (rising_edge(iClk)) then
 			if (icLoadEn = '1') then
-			    registerFile(to_integer(unsigned(icRegINsel))) <= idDataIn;
+			    if (icPC = '0') then
+			     registerFile(to_integer(unsigned(icRegINsel))) <= idDataIn;
+			    else
+			     registerFile(to_integer(unsigned(icRegINsel))) <= idPC;
+			    end if;
 				sdCarry <= idCarryIn;
 				sdZero  <= idZeroIn;
 				

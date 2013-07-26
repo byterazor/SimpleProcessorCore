@@ -32,8 +32,6 @@ entity SenderAndFifo is
 		
 		icSend		: in  std_logic;					--! signal description add data <idDataSend> to Fifo (Enable Signal)
 		idDataSend	: in  std_logic_vector(7 downto 0); --! signal description data to be added to the Fifo
-		idParity    : in  std_logic;                    --! signal description the parity bit for the data
-		icEnableParity: in std_logic;                   --! signal description enable the sending of the parity bit
 		ocSEmpty	: out std_logic;					--! signal description indicates that Fifo is empty
 		ocSFull		: out std_logic;					--! signal description indicates that Fifo is full
 		ocSAlmostE	: out std_logic;					--! signal description indicates that Fifo is empty to half full
@@ -51,8 +49,6 @@ architecture arch of SenderAndFifo is
     		iReset		: in  STD_LOGIC;
            	icSend 		: in  STD_LOGIC;
            	idData 		: in  STD_LOGIC_VECTOR (7 downto 0);
-           	idParity    : in  std_logic;
-           	icEnableParity:in std_logic;
           	odTransmit 	: out  STD_LOGIC;
 			ocReady		: out  STD_LOGIC;
 			ocSyn		: out  STD_LOGIC);
@@ -68,8 +64,8 @@ architecture arch of SenderAndFifo is
 			iClkRead 	: in  std_logic; 
 			icReadEn	: in  std_logic;
 			
-			idDataIn	: in  std_logic_vector(8 downto 0);
-			odDataOut	: out std_logic_vector(8 downto 0);
+			idDataIn	: in  std_logic_vector(7 downto 0);
+			odDataOut	: out std_logic_vector(7 downto 0);
 			
 			ocEmpty		: out std_logic;
 			ocFull		: out std_logic;
@@ -82,7 +78,7 @@ architecture arch of SenderAndFifo is
 	signal scSenderRead		: std_logic;
 	signal scSenderReadEn   : std_logic;
 	
-	signal sdDataToSend		: STD_LOGIC_VECTOR (8 downto 0);
+	signal sdDataToSend		: STD_LOGIC_VECTOR (7 downto 0);
 	signal scSenderEmpty	: std_logic;
 	signal scSenderFull		: std_logic;
 	signal scSenderAEmpty	: std_logic;
@@ -96,8 +92,6 @@ architecture arch of SenderAndFifo is
 	signal sSenderCtrlState : SenderCtrlType;
 	
 	signal seSend : std_logic;
-	
-	signal sdFifoDataIn    :   std_logic_vector(8 downto 0);
 	
 begin
 	
@@ -114,7 +108,7 @@ begin
 						iClkRead 	=> iSysClk,
 						icReadEn	=> scSenderReadEn,
 						
-						idDataIn	=> sdFifoDataIn,
+						idDataIn	=> idDataSend,
 						odDataOut	=> sdDataToSend,
 						
 						ocEmpty		=> scSenderEmpty,
@@ -123,9 +117,7 @@ begin
 						ocAlmostE	=> scSenderAEmpty,
 						ocAlmostF	=> scSenderAFull
 					);
-    
-    sdFifoDataIn    <= idDataSend & idParity;
-    
+
 	ocSEmpty	<= scSenderEmpty;
 	ocSFull		<= scSenderFull;
 	ocSAlmostE	<= scSenderAEmpty;
@@ -137,9 +129,7 @@ begin
                         ieBaudClkEn => ieBaudClkEn,
 			    		iReset		=> iReset,
 			           	icSend 		=> scSenderSendReq,
-			           	idData 		=> sdDataToSend(8 downto 1),
-			           	idParity    => sdDataToSend(0),
-			           	icEnableParity=>icEnableParity,
+			           	idData 		=> sdDataToSend,
 			          	odTransmit 	=> odTransmit,
 						ocReady		=> scSenderReady,
 						ocSyn		=> scSyn

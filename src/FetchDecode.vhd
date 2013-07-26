@@ -42,8 +42,10 @@ entity FetchDecode is
 		icAddrSel	: in  std_logic;
 		icLoadInstr	: in  std_logic;
 		icJump		: in  std_logic;
-		icNextPC		: in  std_logic;
-		
+		icNextPC	: in  std_logic;
+		odPC        : out ADDRESS;  
+		idPC        : in  ADDRESS;
+		icUsePC     : in  std_logic;
 		odAddress	: out ADDRESS;
 		odImmidiate : out DATA;
 		odRegAsel   : out std_logic_vector(4 downto 0);
@@ -66,7 +68,7 @@ architecture Behavioral of FetchDecode is
 	signal scOp, scOp_next 		: OPTYPE;
 	
 begin
-	Transition: process(idData, sdImmidate, icLoadInstr, icJump, icNextPC, sdAdr, sdPC, scOp, sdRegAsel, sdRegBsel, sdRegINsel)
+	Transition: process(idData, sdImmidate, icLoadInstr, icJump, icNextPC, sdAdr, sdPC, scOp, sdRegAsel, sdRegBsel, sdRegINsel, icUsePC, idPC)
 	begin
 		-- defaults
 		sdAdr_next <= sdAdr;
@@ -80,7 +82,7 @@ begin
         
         --! ISA Definition	    
 		if (icLoadInstr = '1') then
-			sdAdr_next <= "0000" & idData(11 downto 0);
+			sdAdr_next <=  idData(15 downto 0);
 			sdImmidiate_next <= "0000000000000000" & idData(15 downto 0);
 			sdRegINsel_next  <= idData(25 downto 21);
 			sdRegAsel_next   <= idData(20 downto 16);
@@ -102,11 +104,17 @@ begin
 				when "001100"	=> scOp_next <= jpz;
 				when "001101"	=> scOp_next <= jpc;
 				when "001110"	=> scOp_next <= jmp; 
-				when "001111" => scOP_next <= li;
+				when "001111"   => scOP_next <= li;
+				when "010000"   => scOp_next <= jmc;
+				when "010001"   => scOp_next <= ret;
 				when others	=> scOp_next <= hlt;
 			end case;
 		end if;
-					
+		
+		if (icUsePC = '1') then
+          sdPC_next   <= idPC;
+        end if;
+				
 		if (icJump = '1') then
 			sdPC_next  <= sdAdr;
 		
@@ -114,8 +122,9 @@ begin
 		
 		if (icNextPC = '1') then
 			sdPC_next  <= sdPC + '1';
-	
 		end if;
+		
+		
 	end process;
 
 
@@ -145,9 +154,12 @@ begin
 	end process;
 
 	-- Output
-	odAddress <= 	sdAdr when icAddrSel = '0' and icLoadInstr = '0' else
-						sdAdr_next when icAddrSel = '0' and icLoadInstr = '1' else
-						sdPC; -- addr_sel = '1'
+	odAddress <=   idPC  when icUsePC = '1' else	
+	               sdAdr when icAddrSel = '0' and icLoadInstr = '0' else
+				   sdAdr_next when icAddrSel = '0' and icLoadInstr = '1' else
+				   sdPC; -- addr_sel = '1'
+	
+	odPC      <= sdPC;
 						
 	ocOperation <= scOp when icLoadInstr = '0' else
 						scOp_next;				
