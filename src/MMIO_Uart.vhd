@@ -102,7 +102,7 @@ begin
     
     scBaud  <=  to_integer(unsigned(srBaud));
     
-    odDebug <= srTransmit(7 downto 0);
+    odDebug <= scUARTRempty & srReceive(6 downto 0);
     
     uart0: UART
     generic map(
@@ -165,7 +165,6 @@ begin
                                                 current_state       <= st_write;
                                                 
                                             else
-                                                tData   <= srStatus;
                                                 
                                                 scUARTsend          <= '0';
                                                 scUartReadEnable    <= '0';

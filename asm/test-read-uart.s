@@ -1,4 +1,5 @@
 start:
+lui $30, 1
 loa $1, 65520
 jmc print
 jmc wait
