@@ -1,0 +1,18 @@
+NET clk  				LOC = C9;	# Taktsignal Taktgenerator
+NET clk_man  			LOC = H18;		# Manuelles Taktsignal �ber Taster button north
+
+NET reset	  			LOC = N17;		# Reset, Schiebeschalter links
+
+NET switch(0)				LOC = L13;	# SW0
+NET switch(1)				LOC	= L14;	# SW1
+
+NET led(0)				LOC = F12;
+NET led(1)				LOC = E12;
+NET led(2)				LOC = E11;
+NET led(3)				LOC = F11;
+NET led(4)				LOC = C11;
+NET led(5)				LOC = D11;
+NET led(6)				LOC = E9;
+NET led(7)				LOC = F9;
+
+NET "clk_man" CLOCK_DEDICATED_ROUTE = FALSE;
