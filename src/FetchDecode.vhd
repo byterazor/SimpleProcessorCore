@@ -150,20 +150,20 @@ begin
 
     -- Output everything to the correct output signal
     odAddress <= idPC  when icUsePC = '1' else
-                   sdAdr when icAddrSel = '0' and icLoadInstr = '0' else
-                   sdAdr_next when icAddrSel = '0' and icLoadInstr = '1' else
+                   sdAdr when icAddrSel = '0' and icDecodeInstr = '0' else
+                   sdAdr_next when icAddrSel = '0' and icDecodeInstr = '1' else
                    sdPC; -- addr_sel = '1'
 
     odPC <= sdPC;
 
-    ocOperation <= scOp when icLoadInstr = '0' else
+    ocOperation <= scOp when icDecodeInstr = '0' else
                         scOp_next;                
 
-    odImmidiate <= sdImmidate when icLoadInstr = '0' else sdImmidiate_next;
+    odImmidiate <= sdImmidate when icDecodeInstr = '0' else sdImmidiate_next;
 
-    odRegAsel  <= sdRegAsel  when icLoadInstr = '0' else sdRegAsel_next;
-    odRegBsel  <= sdRegBsel  when icLoadInstr = '0' else sdRegBsel_next;
-    odRegINsel <= sdRegINsel when icLoadInstr = '0' else sdRegINsel_next;
+    odRegAsel  <= sdRegAsel  when icDecodeInstr = '0' else sdRegAsel_next;
+    odRegBsel  <= sdRegBsel  when icDecodeInstr = '0' else sdRegBsel_next;
+    odRegINsel <= sdRegINsel when icDecodeInstr = '0' else sdRegINsel_next;
 
 
 end Behavioral;
