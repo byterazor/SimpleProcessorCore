@@ -1,0 +1,3 @@
+VHDL_PKG    += 
+VHDL_TB     += 
+VHDL_SRC    += src/CDC_fifoIF.vhd src/dual_port_block_ram.vhd src/SimpleFifo.vhd

@@ -1,0 +1,11 @@
+    Simple Fifo
+--------------------
+
+
+Simple Fifo is a VHDL Module implementing a very simple Fifo with 
+configurable datawidth and depth...
+
+It uses a self written clock domain crossing component and a dual port block ram module.
+
+If you find bugs in these components, please fix them and send a pull request to
+dmeyer@federationhq.de.
