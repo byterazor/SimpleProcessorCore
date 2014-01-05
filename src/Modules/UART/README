@@ -1,0 +1,8 @@
+    Uart Component
+---------------------
+
+Component is a fork of the UART Component written by Marcel Eckert marcel.eckert@hsu-hh.de
+at the Helmut Schmidt University in Hamburg.
+
+The main difference at the moment is the usage of the SimpleFifo Component as Fifos
+not multiple Implementations for different FPGAs.

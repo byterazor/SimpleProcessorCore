@@ -29,9 +29,10 @@ entity UART is
 		iReset		: in  std_logic;
 
 		icBaudLExt   : in  integer := 0;
-		
+		icEnableParity : in std_logic := '0';
 		icSend		: in  std_logic;
 		idDataSend	: in  std_logic_vector(7 downto 0);
+		idParity    : in  std_logic := '0';
 		ocSEmpty	: out std_logic;
 		ocSFull		: out std_logic;
 		ocSAlmostE	: out std_logic;
@@ -40,6 +41,7 @@ entity UART is
 		odTransmit	: out std_logic;
 		
 		odDataRcvd	: out  std_logic_vector(7 downto 0);
+		odParity    : out  std_logic;
 		ocREmpty	: out std_logic;
 		ocRFull		: out std_logic;
 		ocRAlmostE	: out std_logic;
@@ -90,9 +92,10 @@ architecture arch of UART is
 			ieClkEn     : in  std_logic;
 			ieBaudClkEn	: in  std_logic;	
 			iReset		: in  std_logic;
-			
 			icSend		: in  std_logic;
 			idDataSend	: in  std_logic_vector(7 downto 0);
+			idParity    : in  std_logic;
+			icEnableParity : in std_logic;
 			ocSEmpty	: out std_logic;
 			ocSFull		: out std_logic;
 			ocSAlmostE	: out std_logic;
@@ -110,6 +113,8 @@ architecture arch of UART is
 			iReset		: in  std_logic;
 			
 			odDataRcvd	: out  std_logic_vector(7 downto 0);
+			odParity    : out  std_logic;
+			icEnableParity:in  std_logic;
 			ocREmpty	: out std_logic;
 			ocRFull		: out std_logic;
 			ocRAlmostE	: out std_logic;
@@ -189,7 +194,9 @@ end generate;
 						iReset		=> iReset,
 						
 						icSend		=> icSend,
+						icEnableParity=> icEnableParity,
 						idDataSend	=> idDataSend,
+						idParity    => idParity,
 						ocSEmpty	=> ocSEmpty,
 						ocSFull		=> ocSFull,
 						ocSAlmostE	=> ocSAlmostE,
@@ -205,7 +212,9 @@ end generate;
 						ie4xBaudClkEn	=> se4BaudReceiver,
 						iReset		=> iReset,
 						
+						icEnableParity=>icEnableParity,
 						odDataRcvd	=> odDataRcvd,
+						odParity    => odParity,
 						ocREmpty	=> ocREmpty,
 						ocRFull		=> ocRFull,
 						ocRAlmostE	=> ocRAlmostE,

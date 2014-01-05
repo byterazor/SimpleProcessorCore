@@ -27,15 +27,17 @@ entity Sender is
     		iReset		: in  STD_LOGIC;						--! signal description synchronous reset
            	icSend 		: in  STD_LOGIC;						--! signal description force a send of <idData>
            	idData 		: in  STD_LOGIC_VECTOR (7 downto 0);	--! signal description the data to be sent
+           	idParity    : in  std_logic;                        --! signal description the parity bit of the data
+           	icEnableParity:in std_logic;                        --! signal description enable sending of the parity bit
           	odTransmit 	: out  STD_LOGIC;						--! signal description signal for the RS232 Tx line
 			ocReady		: out  STD_LOGIC;						--! signal description signals availability of the Sender (no Sending in Progress)
 			ocSyn		: out  STD_LOGIC);						--! signal description signals sending of first Stop Bit 
 end Sender;
 
 architecture Behavioral of Sender is
-	signal temp, tnext  :STD_LOGIC_VECTOR(11 downto 0);
+	signal temp, tnext  :STD_LOGIC_VECTOR(12 downto 0);
 	
-	type StateType is (WAITING, INIT, HIGH, START, DATA0, DATA1, DATA2, DATA3, DATA4, DATA5, DATA6, DATA7, STOP1, STOP2);
+	type StateType is (WAITING, INIT, HIGH, START, DATA0, DATA1, DATA2, DATA3, DATA4, DATA5, DATA6, DATA7, PARITY, STOP1, STOP2);
 	signal state : StateType;
 begin
 	process(iSysClk)
@@ -53,7 +55,11 @@ begin
     			case state is
     				when WAITING => 
     					if (icSend = '1') then
-    						temp <= "11" & idData & "01";
+    					   if (icEnableParity = '1') then
+    					    temp <= "11" & idParity & idData &  "01";
+    					   else
+    						temp <= "111" & idData & "01";
+    					   end if;
     						state <= INIT;
     					else
     						state <= WAITING;
@@ -90,7 +96,14 @@ begin
     					state <= DATA7;
     					
     				when DATA7 =>
-    					state <= STOP1;
+    				    if (icEnableParity = '1') then
+    				        state <= PARITY;
+    				    else
+    					   state <= STOP1;
+    					end if;
+    					
+    			    when PARITY  =>
+    			         state <= STOP1;
     				
     				when STOP1 =>
     					state <= STOP2;
@@ -104,7 +117,7 @@ begin
 		end if;
 	end process;
 
-	tnext <= '1' & temp(11 downto 1);
+	tnext <= '1' & temp(12 downto 1);
 	ocReady <= '1' when state = WAITING else
 				'0';
 	

@@ -22,20 +22,21 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
 entity ReceiverAndFifo is
+   
 	port  (
-		iSysClk 	: in  std_logic;						--! signal description System side clock
-		ieClkEn     : in  std_logic;
+		iSysClk 	  : in  std_logic;						--! signal description System side clock
+		ieClkEn       : in  std_logic;
 		ie4xBaudClkEn : in  std_logic;      				--! signal description UART clock (4xBAUD Rate frequency!)
-		iReset		: in  std_logic;						--! signal description asynchronous reset
-		
-		odDataRcvd	: out  std_logic_vector(7 downto 0);	--! signal description data from Fifo
-		ocREmpty	: out std_logic;						--! signal description indicates that Fifo is empty
-		ocRFull		: out std_logic;						--! signal description indicates that Fifo is full
-		ocRAlmostE	: out std_logic;						--! signal description indicates that Fifo is empty to half full
-		ocRAlmostF	: out std_logic;						--! signal description indicates that Fifo is half full to full
-		icRReadEn	: in  std_logic;						--! signal description get next value from Fifo (Fifo is in First Word Fall Through Mode!)
-		
-		idReceive	: in  std_logic							--! signal description signal for the RS232 Tx line
+		iReset		  : in  std_logic;						--! signal description asynchronous reset
+	    icEnableParity: in  std_logic;                      --! signal description allow reception of parity bit	
+		odDataRcvd	  : out  std_logic_vector(7 downto 0);	--! signal description data from Fifo
+		odParity      : out  std_logic;                       --! possible parity bit
+		ocREmpty	  : out std_logic;						--! signal description indicates that Fifo is empty
+		ocRFull		  : out std_logic;						--! signal description indicates that Fifo is full
+		ocRAlmostE	  : out std_logic;						--! signal description indicates that Fifo is empty to half full
+		ocRAlmostF	  : out std_logic;						--! signal description indicates that Fifo is half full to full
+		icRReadEn	  : in  std_logic;						--! signal description get next value from Fifo (Fifo is in First Word Fall Through Mode!)
+		idReceive	  : in  std_logic							--! signal description signal for the RS232 Tx line
 	);
 end ReceiverAndFifo;
 
@@ -43,39 +44,50 @@ architecture arch of ReceiverAndFifo is
 
 	component Receiver is
 	    port ( 
-	    	iSysClk    : in  std_logic;                    
-            ie4BaudClkEn : in  std_logic;
-	    	reset 	: in  STD_LOGIC;
-	        Rx 		: in  STD_LOGIC;
-	        data 	: out STD_LOGIC_VECTOR (7 downto 0);
-			ready 	: out STD_LOGIC);
+	    	iSysClk       : in  std_logic;                    
+            ie4BaudClkEn  : in  std_logic;
+	    	reset 	      : in  STD_LOGIC;
+	        Rx 		      : in  STD_LOGIC;
+	        data 	      : out STD_LOGIC_VECTOR (7 downto 0);
+	        parity        : out std_logic;
+	        icEnableParity: in  std_logic;
+			ready 	      : out STD_LOGIC);
 	end component;
 	
-	component Fifo is
-		port  (
-			iReset		: in  std_logic;
-			
-			iClkWrite 	: in  std_logic; 
-			icWriteEn	: in  std_logic;
-			
-			iClkRead 	: in  std_logic; 
-			icReadEn	: in  std_logic;
-			
-			idDataIn	: in  std_logic_vector(7 downto 0);
-			odDataOut	: out std_logic_vector(7 downto 0);
-			
-			ocEmpty		: out std_logic;
-			ocFull		: out std_logic;
-			
-			ocAlmostE	: out std_logic;
-			ocAlmostF	: out std_logic
-		);
-	end component;
+    component SimpleFifo is
+        generic (
+        GEN_WIDTH     : integer    := 9;        --! Data width of each data word
+        GEN_DEPTH     : integer    := 256;      --! how many values can be stored in Fifo
+
+        GEN_A_EMPTY : integer := 2;             --! when is the FIFO signaled as almost empty
+        GEN_A_FULL  : integer := 250            --! when is the FIFO signaled as almost full
+
+    );
+        port  (
+            icReset         : in  std_logic;
+
+            icWriteClk      : in  std_logic;
+            icWe         : in  std_logic;
+
+            icReadClk       : in  std_logic;
+            icReadEnable : in  std_logic;
+
+            idData            : in  std_logic_vector(8 downto 0);
+            odData            : out std_logic_vector(8 downto 0);
+
+            ocEmpty         : out std_logic;
+            ocFull          : out std_logic;
+
+            ocAempty     : out std_logic;
+            ocAfull     : out std_logic
+        );
+    end component;
 
     signal scRWrite         : std_logic;
 	signal scRWriteEn 		: std_logic;
 	signal seRReadEn        : std_logic;
-	signal sdDataRcvd		: STD_LOGIC_VECTOR (7 downto 0);
+	signal sdDataRcvd		: STD_LOGIC_VECTOR (8 downto 0);
+	signal sdParity         : std_logic;
 	
 	signal scRcvrEmpty		: std_logic;
 	signal scRcvrFull		: std_logic;
@@ -90,24 +102,25 @@ begin
     scRWriteEn <= scRWrite and ie4xBaudClkEn;
     seRReadEn <= icRReadEn and ieClkEn;
     
-	rcvFifo : Fifo
+	rcvFifo : SimpleFifo
 					PORT MAP(
-						iReset		=> iReset,
+						icReset		=> iReset,
 			
-						iClkWrite 	=> iSysClk,
-						icWriteEn	=> scRWriteEn,
+						icWriteClk 	=> iSysClk,
+						icWe	=> scRWriteEn,
 						
-						iClkRead 	=> iSysClk,
-						icReadEn	=> seRReadEn,
+						icReadClk 	=> iSysClk,
+						icReadEnable	=> seRReadEn,
 						
-						idDataIn	=> sdDataRcvd,
-						odDataOut	=> odDataRcvd,
+						idData	=> sdDataRcvd,
+						odData(8 downto 1)	=> odDataRcvd,
+					    odData(0)            => odParity,
 						
 						ocEmpty		=> scRcvrEmpty,
 						ocFull		=> scRcvrFull,
 						
-						ocAlmostE	=> scRcvrAEmpty,
-						ocAlmostF	=> scRcvrAFull
+						ocAempty	=> scRcvrAEmpty,
+						ocAfull	=> scRcvrAFull
 					);
 
 	ocREmpty	<= scRcvrEmpty;
@@ -121,10 +134,13 @@ begin
                             ie4BaudClkEn => ie4xBaudClkEn,
 					    	reset	=> iReset, 
 					        Rx 		=> idReceive,
-					        data 	=> sdDataRcvd,
+					        data 	=> sdDataRcvd(8 downto 1),
+					        parity  => sdDataRcvd(0),
+					        icEnableParity => icEnableParity,
 							ready 	=> scReaderReady
 						);
-						
+	
+	
 	ReceiverCtrl : process (iSysClk)
     begin
         if (rising_edge(iSysClk)) then

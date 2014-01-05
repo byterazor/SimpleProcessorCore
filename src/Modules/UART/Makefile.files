@@ -1,0 +1,3 @@
+VHDL_SRC	+= Receiver.vhd ReceiverAndFifo.vhd Sender.vhd SenderAndFifo.vhd UART.vhd          
+VHDL_PKG    +=
+VHDL_TB		+=
