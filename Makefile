@@ -1,6 +1,6 @@
 include .config
 #location of Makefiles
-MAKEFILES_PATH=/home/dmeyer/Programmieren/Make/Makefiles/
+MAKEFILES_PATH=/home/dmeyer/Programmieren/Makefiles/
 
 #which FPGA are we synthesizing for ?
 FPGA=xc5vlx110t-3-ff1136
@@ -12,7 +12,7 @@ SD= NGC/
 
 #which is the TOP Module of the project ?
 TOP=SOC
-UCF=UCF/xc5vlx110t-3-ff1136.ucf
+UCF=UCF/ML505.ucf
 
 #is this a partial reconfiguration project 
 RECONFIGURATION=0
@@ -23,12 +23,12 @@ FLAGS = -O0  -rangecheck -check_synthesis  +acc=full
 #xilinx license server
 XILINX_LICENSE=2100@192.168.1.5
 #path to Xilinx tools
-XILINX_PATH=/home/Xilinx/14.1/ISE_DS/ISE/bin/lin64/
+XILINX_PATH=/opt/tools/Xilinx/14.1/ISE_DS/ISE/bin/lin64/
 
 #modelsim license server
 MODELSIM_LICENSE=1718@192.168.1.5
 #path to modelsim tools
-MODELSIM_PATH=/home/modeltech/modelsim/linux_x86_64
+MODELSIM_PATH=/opt/tools/Modelsim/modeltech/linux_x86_64
 
 
 

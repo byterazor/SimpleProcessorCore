@@ -1,1 +1,1 @@
-Modules += src/UART 
+Modules += src/Modules/SimpleFifo src/Modules/UART 
