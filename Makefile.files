@@ -1,4 +1,11 @@
 VHDL_PKG   	+= src/cpupkg.vhd
 VHDL_TB		+= src/TBRechner.vhd
 VHDL_SRC	+= src/RegFile.vhd src/CPU.vhd src/MemInterface.vhd src/FetchDecode.vhd src/ALU.vhd src/RAM.vhd 
-VHDL_SRC	+= src/SOC.vhd src/ControlUnit.vhd src/MMIO_Uart.vhd src/clkDivider.vhd src/ClkEnable.vhd src/MemoryMapper.vhd
+VHDL_SRC	+= src/ControlUnit.vhd src/MMIO_Uart.vhd src/clkDivider.vhd src/ClkEnable.vhd src/MemoryMapper.vhd
+VHDL_SRC    += src/SOC.vhd
+
+ifeq ($(BOARD_TARGET), spartan3e)
+    VHDL_SRC += src/top_spartan3e.vhd
+else
+    VHDL_SRC += src/top_generic.vhd 
+endif

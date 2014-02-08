@@ -1,0 +1,41 @@
+#
+# Makefile for using kernel config scripts for xilinx configuration
+#
+# written by Marcel Eckert <marcel.eckert@hsu-hh.de>
+# 
+# License: GPLv2
+#
+
+
+KCONFIG_SUBDIR	:= kconfig/
+
+.config:
+	$(MAKEFILES_PATH)$(KCONFIG_SUBDIR)conf $(MAKEFILES_PATH)Kconfig
+
+.PHONY: kconfig_clean
+kconfig_clean:
+	$(MAKE) -i -s --directory=$(MAKEFILES_PATH)$(KCONFIG_SUBDIR) clean
+
+.PHONY: config
+config: $(MAKEFILES_PATH)$(KCONFIG_SUBDIR)conf Kconfig
+	$(MAKEFILES_PATH)$(KCONFIG_SUBDIR)conf $(MAKEFILES_PATH)Kconfig
+
+.PHONY: menuconfig
+menuconfig: $(MAKEFILES_PATH)$(KCONFIG_SUBDIR)mconf Kconfig
+	$(MAKEFILES_PATH)$(KCONFIG_SUBDIR)mconf $(MAKEFILES_PATH)Kconfig
+
+
+
+## recursive make calls to kconfig subdir for building the executables
+
+$(MAKEFILES_PATH)$(KCONFIG_SUBDIR)conf:
+	$(MAKE) --directory=$(MAKEFILES_PATH)$(KCONFIG_SUBDIR) $(@F)
+
+$(MAKEFILES_PATH)$(KCONFIG_SUBDIR)mconf:
+	$(MAKE) --directory=$(MAKEFILES_PATH)$(KCONFIG_SUBDIR) $(@F)
+
+
+# rule to create an empty Kconfig file in project directory if none exist
+Kconfig:
+	@echo "**** Creating empty Kconfig file for project"
+	@touch Kconfig

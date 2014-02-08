@@ -1,0 +1,94 @@
+#
+# For a description of the syntax of this configuration file,
+# see Documentation/kbuild/kconfig-language.txt.
+#
+
+
+mainmenu "System configuration for Simple Processor Core"
+
+comment "General project settings"
+
+config EVAL_BOARD
+	bool "use evaluation board"
+	default y
+
+config MAKEFILES_PATH
+	string
+	option env="MAKEFILES_PATH"
+
+source "$MAKEFILES_PATH/Kconfig.boards"
+
+config FPGA_TYPE
+	string "fpga type"
+	depends on !EVAL_BOARD
+
+config IMPACT_TARGET
+	string "impact tool jtag chain target number"
+	depends on !EVAL_BOARD
+
+config NGC_LOOKUP
+	string ".ngc files lookup directories"
+	default "./"
+
+config XILINX_VERBOSE_OUTPUT
+	bool "verbose output for Xilinx tools"
+
+menu "tool invokation parameters (flags)"
+comment "Xilinx tools"
+
+config XILINX_XST_FLAGS
+	string "xst flags"
+	default ""
+
+config XILINX_NGDBUILD_FLAGS
+	string "ngdbuild flags"
+	default ""
+
+config XILINX_MAP_FLAGS
+	string "map flags"
+	default ""
+
+config XILINX_PAR_FLAGS
+	string "par flags"
+	default ""
+
+config XILINX_BITGEN_FLAGS
+	string "bitgen flags"
+	default ""
+
+endmenu
+
+menu "General tool options"
+
+comment "General System"
+config  SYSTEM_64
+	bool "Is System 64bit ?"
+	default y
+
+comment "Xilinx tools"
+config XILINX_INSTALL_DIR
+	string "Xilinx installation directory"
+	default "/opt/Xilinx"
+
+config XILINX_VERSION
+	string "Xilinx version to use"
+
+config XILINX_SERVER
+	string "Xilinx license server"
+	default "2100@192.168.1.5"
+
+
+comment "Modelsim"
+config MODELSIM_INSTALL_DIR
+	string "Modelsim installation directory"
+	default "/opt/modeltech/linux"
+
+config MODELSIM_SERVER
+	string "Modelsim license server"
+	default "1718@192.168.1.5"
+
+endmenu
+
+
+# the followin will call the project specific Kconfig file
+source Kconfig

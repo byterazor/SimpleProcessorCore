@@ -1,50 +1,17 @@
-include .config
-#location of Makefiles
-MAKEFILES_PATH=/home/dmeyer/Programmieren/Makefiles/
-
-#which FPGA are we synthesizing for ?
-FPGA=xc5vlx110t-3-ff1136
-
-#NR of the FPGA in jtag chain
-DEVICE_NR=5
-
-SD= NGC/
-
-#which is the TOP Module of the project ?
-TOP=SOC
-UCF=UCF/ML505.ucf
-
-#is this a partial reconfiguration project 
-RECONFIGURATION=0
-
-#modelsim vcom Flags
-FLAGS = -O0  -rangecheck -check_synthesis  +acc=full
-
-#xilinx license server
-XILINX_LICENSE=2100@192.168.1.5
-#path to Xilinx tools
-XILINX_PATH=/opt/tools/Xilinx/14.1/ISE_DS/ISE/bin/lin64/
-
-#modelsim license server
-MODELSIM_LICENSE=1718@192.168.1.5
-#path to modelsim tools
-MODELSIM_PATH=/opt/tools/Modelsim/modeltech/linux_x86_64
+-include .config
+MAKEFILES_PATH=$(CURDIR)/Makefiles/
+include Makefile.modules
+include $(MAKEFILES_PATH)/Makefile
 
 
-
-# additional parameters for xilinx tools
-XILINX_XST=
-XILINX_NGDBUILD=
-XILINX_MAP=
-XILINX_PAR=
-XILINX_BITGEN=
+ifeq ($(BOARD_TARGET), spartan3e)
+	UCF=UCF/spartan3e.ucf
+endif
 
 
-# xst file parameters
 define XST_PARAMS
 -opt_mode Speed 
 -opt_level 1 
--power NO 
 -iuc NO 
 -netlist_hierarchy as_optimized 
 -rtlview Yes 
@@ -57,9 +24,6 @@ define XST_PARAMS
 -case maintain 
 -slice_utilization_ratio 100 
 -bram_utilization_ratio 100 
--dsp_utilization_ratio 100 
--lc off 
--reduce_control_sets off 
 -fsm_extract YES 
 -fsm_encoding Auto 
 -safe_implementation Yes 
@@ -72,7 +36,6 @@ define XST_PARAMS
 -auto_bram_packing NO 
 -resource_sharing YES 
 -async_to_sync NO 
--use_dsp48 auto 
 -iobuf YES 
 -keep_hierarchy NO 
 -max_fanout 100000 
@@ -83,8 +46,5 @@ define XST_PARAMS
 endef
 export XST_PARAMS
 
-%/blockRAM.o: %/blockRAM.vhd
-	@export LM_LICENSE_FILE=$(MODELSIM_LICENSE);$(MODELSIM_PATH)/vcom -ignorevitalerrors -permissive -work work $< | grep -E 'Compiling|Error:|Warning:'
-	@touch $@
-
-include $(MAKEFILES_PATH)/Makefile
+test:
+	@echo $(BOARD_TARGET)

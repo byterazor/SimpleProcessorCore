@@ -1,0 +1,35 @@
+# include a .config file if existing
+-include .config
+
+#check for includes
+MF=${shell if [ -e Makefile.files ]; then echo 1; else echo 0; fi}
+MM=${shell if [ -e Makefile.modules ]; then echo 1; else echo 0; fi}
+MC=${shell if [ -e Makefile.PR ]; then echo 1; else echo 0; fi}
+
+MODULE=$(CURDIR)
+
+.PHONY : clean 
+
+ifeq ($(MF),1)
+include Makefile.files
+endif
+
+ifeq ($(MM),1)
+include Makefile.modules
+endif
+
+Make.sources:
+	@echo "**** Creating Make.sources for $(CURDIR)"
+	$(foreach f,$(Modules), (cd $f; make -f $(MAKEFILES_PATH)/Makefile.gensources MAKEFILES_PATH=$(MAKEFILES_PATH) $(SUBMAKE) SUBMAKE=$(SUBMAKE) TOPDIR=${TOPDIR} BOARD_TARGET=$(BOARD_TARGET) FPGA_FAMILY=$(FPGA_FAMILY) );)
+	$(foreach f,$(Modules),  cat $f/Make.sources >> $@;)
+	$(foreach f,$(VHDL_SRC), echo VHDL_SRC +=$(MODULE)/$f >> $@;)
+	$(foreach f,$(VERILOG_SRC), echo $f | grep -c '^/' >/dev/null; if [ $$? -eq 0 ]; then echo VERILOG_SRC +=$f >> $@; else echo VERILOG_SRC +=$(MODULE)/$f >> $@; fi;)
+	$(foreach f,$(VHDL_PKG), echo VHDL_PKG +=$(MODULE)/$f >> $@;)
+	$(foreach f,$(VHDL_TB), echo VHDL_TB +=$(MODULE)/$f >> $@;)
+	
+
+clean:
+	@$(foreach f,$(Modules), (cd $f; make -f $(MAKEFILES_PATH)/Makefile.gensources clean);)
+	@$(foreach f,$(RM_TUPEL), (src=`echo $f | sed 's/(//' | sed 's/)//' | awk -F',' '{print $$4}'`; cd $$src; make -f $(MAKEFILES_PATH)/Makefile.gensources clean );)
+	-@rm Make.sources
+	

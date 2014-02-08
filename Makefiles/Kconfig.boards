@@ -1,0 +1,16 @@
+
+
+choice
+        prompt "board type"
+        default BOARD_ML505
+        depends on EVAL_BOARD
+
+config BOARD_ML505
+        bool "ML505"
+
+config BOARD_SPARTAN3E500
+        bool "Spartan3e(500)"
+
+endchoice
+
+

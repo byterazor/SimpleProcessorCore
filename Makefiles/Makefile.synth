@@ -1,0 +1,46 @@
+include Make.sources
+
+CLEAN_FILES+=*.ucf *.ngc *.prj *.xst xst.log *.lso *.xrpt *.srp _xmsgs xst __ngo *.ngd *.bld xlnx_auto*
+CLEAN_FILES+=.config.old _impact* *.log *.bit *.bgn *.drc *.ngr *.pad *.par *.pcf *.ptwx *.unroutes
+CLEAN_FILES+=*.xpi *.map *.mrp *.ngm *.csv *.txt *.xml *.xwbt *.html 
+
+%.prj: $(VHDL_SRC) $(VHDL_PKG) $(VERILOG_SRC) 
+	@sleep 1
+	@echo "**** Creating Xilinx Project file  $@****"
+	@if [ -e $@ ]; then rm $@; fi
+	@$(foreach f,$(VHDL_PKG),echo "vhdl work $f" >> $@ ;)
+	@$(foreach f,$(VHDL_SRC),echo "vhdl work $f" >> $@ ;)
+	@$(foreach f,$(VERILOG_SRC),echo "verilog work $f" >> $@ ;)
+	
+	
+%.xst: %.prj 
+	@echo "**** Creating XST file ($@) ****"
+	@echo run	> $@
+	@echo -ifn $(subst .xst,,$(@F)).prj >>$@
+	@echo -ifmt mixed >>$@
+	@echo -ofn $(subst .xst,,$(@F)) >>$@
+	@echo -ofmt NGC >>$@
+	@echo -p ${FPGA} >>$@
+	@echo -top ${TOP} >>$@
+	@echo "$$XST_PARAMS" >>$@ 
+	
+	
+%.ngc: %.xst %.prj 
+	@echo "**** Running XST ($@)****"
+	@export XILINXD_LICENSE_FILE=$(XILINX_LICENSE);cd $(dir $<); $(XILINX_PATH)/xst -ifn $(<F) $(XILINX_XST) >xst.log;if [ $$? -ne 0 ]; then grep ERROR xst.log; exit 1; else grep "Minimum period" xst.log; fi
+	
+%.ngd: %.ngc $(UCF)
+	@echo "**** Running NGDBUILD ****"
+	@export XILINXD_LICENSE_FILE=$(XILINX_LICENSE);$(XILINX_PATH)/ngdbuild $(XILINX_NGDBUILD) -aul -sd ${SD} -dd __ngo -uc $(UCF) -p ${FPGA} $< $@ > ngdbuild.log	
+	
+%.bgn %.bit %.drc: %.ncd %_map.ncd
+	@echo "**** Creating Bitfile $@****"
+	@export XILINXD_LICENSE_FILE=$(XILINX_LICENSE); $(XILINX_PATH)/bitgen $(XILINX_BITGEN) -w $< >bitgen.log
+
+%.ncd %.pad %_pad.csv %_pad.txt %.par %.xpi: %_map.ncd %.pcf
+	@echo "**** Place components and Routing Signals ****"
+	@export XILINXD_LICENSE_FILE=$(XILINX_LICENSE); $(XILINX_PATH)/par $(XILINX_PAR) -w $< $@ $*.pcf > place.log
+
+%_map.mrp %_map.ncd %_map.ngm %.pcf: %.ngd
+	@echo "**** Mapping components ****"
+	@export XILINXD_LICENSE_FILE=$(XILINX_LICENSE);$(XILINX_PATH)/map $(XILINX_MAP) -w -p ${FPGA} -pr b -c 100 -o $*_map.ncd $< $*.pcf >map.log

@@ -1,0 +1,28 @@
+OBJ 				+= $(foreach i,$(VHDL_PKG),$(patsubst %.vhd,%.o,$i))
+OBJ 				+= $(foreach i,$(VHDL_SRC),$(patsubst %.vhd,%.o,$i))
+OBJ 				+= $(foreach i,$(VHDL_TB),$(patsubst %.vhd,%.o,$i))
+OBJ_DIRS			:= $(dir $(OBJ))
+
+CLEAN_FILES+=$(OBJ) work
+
+.PHONY: modelsim modelsim_clean
+
+simulate:
+	export LM_LICENSE_FILE=$(MODELSIM_LICENSE);$(MODELSIM_PATH)/vsim -novopt $(TB)
+
+work:
+	@export LM_LICENSE_FILE=$(MODELSIM_LICENSE);$(MODELSIM_PATH)/vlib work	
+
+modelsim_compile: work $(OBJ)
+
+modelsim_clean:
+	@echo "**** Cleaning up Modelsim Files"
+	-@rm -rf work 2>/dev/null
+	-@rm $(OBJ) 2>/dev/null
+	
+
+%.o : %.vhd
+	@export LM_LICENSE_FILE=$(MODELSIM_LICENSE);$(MODELSIM_PATH)/vcom $(FLAGS) -work work $< | tee m.log | grep -E 'Compiling|Error:|Warning:'
+	@grep -q Error m.log; if [ "$$?" -eq "1" ]; then touch $@; fi; rm m.log
+
+	
