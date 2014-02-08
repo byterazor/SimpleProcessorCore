@@ -1,0 +1,14 @@
+NET clk  				LOC = C9;	     # 50Mhz Clock Signal
+NET clk                 PERIOD = 20ns;   # 20ns = 50Mhz
+
+NET reset	  			LOC = K17 | IOSTANDARD = LVTTL | PULLDOW;		# Reset, BTN_SOUTH
+
+NET led(0)				LOC = F12;
+NET led(1)				LOC = E12;
+NET led(2)				LOC = E11;
+NET led(3)				LOC = F11;
+NET led(4)				LOC = C11;
+NET led(5)				LOC = D11;
+NET led(6)				LOC = E9;
+NET led(7)				LOC = F9;
+
