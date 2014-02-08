@@ -4,14 +4,18 @@ use ieee.std_logic_1164.all;
 library work;
 use work.cpupkg.all;
 
-entity SOC is													-- Rechner setzt sich aus CPU, RAM und Bus zusammen
-port(	clk			: in std_logic;							-- Taktsignal
-		reset			: in std_logic;							-- Resetsignal
+entity SOC is	
+generic(
+        GEN_SYS_CLK     :   integer := 50000000; --! system clock in HZ
+        GEN_SOC_CLK     :   integer :=  5000000  --! soc clock in HZ
+);												
+port(	icclk			: in std_logic;							-- Taktsignal
+		icreset			: in std_logic;							-- Resetsignal
+		
+		odLED           : out std_logic_vector(7 downto 0);
+		
 		odRS232       :   out std_logic;
-		idRS232       :    in std_logic;
-		data_print_1: out DATA;
-		data_print_2: out DATA;
-		ic200MhzClk   :   in  std_logic
+		idRS232       :    in std_logic
 		);							
 end SOC;
 
@@ -101,32 +105,31 @@ architecture arch of SOC is
 	signal scUART_RnotW        :   std_logic;
 	signal scUART_address      :   std_logic_vector(15 downto 0);
 	
-	signal scClk20Mhz          :   std_logic;
-	
 	signal sdDebug             :   std_logic_vector(7 downto 0);
 	
 	signal scReset             :   std_logic;
+	signal scClk               :   std_logic;
 	
 begin   
 
-    scReset     <= not reset;
+    scReset     <= icReset;
     
-    divider0:clkDivider
+    
+    clk_divider0: clkDivider
     generic map(
-        GEN_FreqIn_Hz  => 200000000,
-        GEN_FreqOut_Hz => 20000000
+        GEN_FreqIn_Hz  => GEN_SYS_CLK,
+        GEN_FreqOut_Hz => GEN_SOC_CLK
     )
     port map(
-        iClk_in        => ic200MhzClk,
+        iClk_in        => icclk,
         iReset         => '0',
-        oClk_out       => scClk20Mhz
+        oClk_out       => scClk
     );
     
-
     
     
 	CPU_1: CPU port map(	
-								iClk 			=> scClk20Mhz, 
+								iClk 			=> scClk, 
 								iReset 		=> scReset,
 								bdData 		=> DATAbus,
 								odAddress	=> address, 
@@ -149,7 +152,7 @@ begin
     
     
 	RAM_1: RAM port map(	
-								iClk			=> scClk20Mhz,
+								iClk			=> scClk,
 								iReset 		=> scReset,
 								bdData 		=> DATAbus, 
 								idAddress	=> scRAM_address, 
@@ -173,7 +176,7 @@ begin
     uart0: MMIO_Uart
     generic map(
         GEN_start              => x"0000",
-        GEN_SysClockinHz       => 20000000,
+        GEN_SysClockinHz       => GEN_SOC_CLK,
         GEN_Baudrate           => 57600,
         GEN_HasExternBaudLimit => false
     )
@@ -182,7 +185,7 @@ begin
         idRS232                => idRS232,
         ocInterrupt            => open,
         odDebug                => sdDebug,
-        iClk                   => scClk20Mhz,
+        iClk                   => scClk,
         iReset                 => scReset,
         bdData                 => DATAbus,
         idAddress              => scUART_address,
@@ -190,8 +193,4 @@ begin
         icRnotW                => scUART_RnotW
     );
     
-    
-	data_print_1 <= DATAbus;
-	data_print_2 <= x"000000" & sdDebug;
-
 end arch;
