@@ -6,6 +6,10 @@ include $(MAKEFILES_PATH)/Makefile
 
 ifeq ($(BOARD_TARGET), spartan3e)
 	UCF=UCF/spartan3e.ucf
+else
+ifeq ($(BOARD_TARGET), ml505)
+	UCF=UCF/ML505.ucf
+endif
 endif
 
 

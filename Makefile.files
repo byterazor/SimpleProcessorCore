@@ -7,5 +7,9 @@ VHDL_SRC    += src/SOC.vhd
 ifeq ($(BOARD_TARGET), spartan3e)
     VHDL_SRC += src/top_spartan3e.vhd
 else
+ifeq ($(BOARD_TARGET), ml505)
+    VHDL_SRC += src/top_ml505.vhd
+else
     VHDL_SRC += src/top_generic.vhd 
+endif
 endif

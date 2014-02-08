@@ -1,18 +1,10 @@
-NET clk  				LOC = C9;	# Taktsignal Taktgenerator
-NET clk_man  			LOC = H18;		# Manuelles Taktsignal �ber Taster button north
+NET icclk  				LOC = L19;	# Taktsignal Taktgenerator
 
-NET reset	  			LOC = N17;		# Reset, Schiebeschalter links
+NET "icClk" TNM_NET        = "CLOCK_MAIN";
+TIMEGRP  "CLOCK_MAIN_GRP"  = "CLOCK_MAIN";
+TIMESPEC "TS_CLOCK_MAIN"   = PERIOD "CLOCK_MAIN_GRP" 5 ns HIGH 50 %;
 
-NET switch(0)				LOC = L13;	# SW0
-NET switch(1)				LOC	= L14;	# SW1
+NET  icReset_n             LOC="E9"; 
 
-NET led(0)				LOC = F12;
-NET led(1)				LOC = E12;
-NET led(2)				LOC = E11;
-NET led(3)				LOC = F11;
-NET led(4)				LOC = C11;
-NET led(5)				LOC = D11;
-NET led(6)				LOC = E9;
-NET led(7)				LOC = F9;
-
-NET "clk_man" CLOCK_DEDICATED_ROUTE = FALSE;
+NET odRS232             LOC = "AG20" | IOSTANDARD = LVTTL ;
+NET idRS232             LOC = "AG15" | IOSTANDARD = LVTTL ;
