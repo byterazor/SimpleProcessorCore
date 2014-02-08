@@ -68,8 +68,6 @@ architecture arch of SenderAndFifo is
 
     );
         port  (
-            icReset         : in  std_logic;
-
             icWriteClk      : in  std_logic;
             icWe         : in  std_logic;
 
@@ -83,7 +81,9 @@ architecture arch of SenderAndFifo is
             ocFull          : out std_logic;
 
             ocAempty     : out std_logic;
-            ocAfull     : out std_logic
+            ocAfull     : out std_logic;
+            icClkEnable  : in  std_logic;                                   --! active high clock enable signal
+            icReset      : in  std_logic
         );
     end component;
 	
@@ -129,7 +129,9 @@ begin
 						ocFull		=> scSenderFull,
 						
 						ocAempty	=> scSenderAEmpty,
-						ocAfull	=> scSenderAFull
+						ocAfull	=> scSenderAFull,
+						
+						icClkEnable => ieClkEn
 					);
     
     sdFifoDataIn    <= idDataSend & idParity;

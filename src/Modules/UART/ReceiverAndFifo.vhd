@@ -64,8 +64,6 @@ architecture arch of ReceiverAndFifo is
 
     );
         port  (
-            icReset         : in  std_logic;
-
             icWriteClk      : in  std_logic;
             icWe         : in  std_logic;
 
@@ -79,7 +77,10 @@ architecture arch of ReceiverAndFifo is
             ocFull          : out std_logic;
 
             ocAempty     : out std_logic;
-            ocAfull     : out std_logic
+            ocAfull     : out std_logic;
+            
+            icClkEnable  : in  std_logic;                                   --! active high clock enable signal
+            icReset      : in  std_logic                                    --! active high reset, values in RAM are not overwritten, just FIFO     
         );
     end component;
 
@@ -120,7 +121,8 @@ begin
 						ocFull		=> scRcvrFull,
 						
 						ocAempty	=> scRcvrAEmpty,
-						ocAfull	=> scRcvrAFull
+						ocAfull	=> scRcvrAFull,
+						icClkEnable => ieClkEn
 					);
 
 	ocREmpty	<= scRcvrEmpty;
