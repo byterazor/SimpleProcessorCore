@@ -33,7 +33,7 @@ architecture arch of RAM is
 	
 	type MEMORY is ARRAY(0 to 255) of DATA;		--! array of data words
 	
-	constant Prog1 : MEMORY := (		--! 4k * 32bit of RAM
+	signal sRAM : MEMORY := (		--! 4k * 32bit of RAM
     0    => B"00001100001000000000000011001000", --loa $1, 200
     1    => B"01000011111000000000000000001101", --jmc print
     2    => B"00001100001000000000000011001001", --loa $1, 201
@@ -94,7 +94,6 @@ architecture arch of RAM is
 	others	=>	(others => '0')
 	);
 	
-	signal sRam 			: MEMORY;
 	signal tData			: DATA;
 	
 	
@@ -107,7 +106,6 @@ begin
 	process(iClk, iReset)
 	begin
 		if (iReset = '1') then
-			sRam <= Prog1;
 			tData <= (others => '0');
 			
 		elsif (rising_edge(iClk)) then
