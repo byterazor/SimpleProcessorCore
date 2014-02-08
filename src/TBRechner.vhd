@@ -41,13 +41,11 @@ ARCHITECTURE behavior OF TBRechner IS
  
     COMPONENT SOC
     PORT(
-         clk : IN  std_logic;
-         reset : IN  std_logic;
+         icclk : IN  std_logic;
+         icreset : IN  std_logic;
+         odLED  : out std_logic_vector(7 downto 0);
          odRS232       :   out std_logic;
-         idRS232       :    in std_logic;
-         ic200MhzClk   :   in  std_logic;
-         data_print_1 : OUT  std_logic_vector(31 downto 0);
-			data_print_2 : OUT  std_logic_vector(31 downto 0)
+         idRS232       :    in std_logic
         );
     END COMPONENT;
     
@@ -55,8 +53,6 @@ ARCHITECTURE behavior OF TBRechner IS
    --Inputs
    signal clk : std_logic := '0';
    signal reset : std_logic := '0';
-	signal data_print_1 : std_logic_vector(31 downto 0);
-	signal data_print_2 : std_logic_vector(31 downto 0);
     
     signal idRS232, odRS232 :   std_logic;
     
@@ -67,13 +63,11 @@ BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
    uut: SOC PORT MAP (
-          clk => clk,
-          ic200MhzClk => clk,
-          reset => reset,
+          icclk => clk,
+          icreset => reset,
+          odLED     => open,
           idRS232   => idRS232,
-          odRS232   => odRS232,
-          data_print_1 => data_print_1,
-			 data_print_2 => data_print_2
+          odRS232   => odRS232
         );
 
    -- Clock process definitions
