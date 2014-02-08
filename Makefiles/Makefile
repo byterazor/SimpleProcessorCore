@@ -13,6 +13,7 @@ DEVICE_NR=$(subst ", , $(CONFIG_IMPACT_TARGET))
 endif
 
 TOP=top
+BIT=soc.bit
 
 ifndef UCF
 UCF=$(subst ", , $(CONFIG_UCF_NAME))
@@ -84,7 +85,7 @@ endif
 
 .PHONY: clean all real_clean
 
-all:
+all: soc.bit
 
 real_clean:
 	git clean -x -f
@@ -93,7 +94,7 @@ clean: kconfig_clean
 	-@rm -rf Make.sources ${CLEAN_FILES} $(OBJ)
 
 
-Make.sources: Makefile.files Makefile.modules
+Make.sources: .config Makefile.files Makefile.modules
 	@clear
 	@echo "****************************************************************************************"
 	@echo "****      XILINX Synthesis, Map, Place, Route and Modelsim Makefile Version " $(VERSION)
@@ -115,11 +116,11 @@ impact.script:
 	@echo "quit" >> $@
 
 program: impact.script 
-	echo "**** Programming FPGA ****"
-	[ -n "$(BIT)"                 ] || ( echo "**** Please give Bitfile on commandline with BIT=<FILE>" && exit 1)
-	cp $(BIT) flash.bit
-	$(XILINX_PATH)/impact -batch impact.script 1>/dev/null
-	rm impact.script
+	@echo "**** Programming FPGA ****"
+	@[ -n "$(BIT)"                 ] || ( echo "**** Please give Bitfile on commandline with BIT=<FILE>" && exit 1)
+	@cp $(BIT) flash.bit
+	@$(XILINX_PATH)/impact -batch impact.script 1>/dev/null
+	@rm impact.script
 
 
 include $(MAKEFILES_PATH)/Makefile.configure

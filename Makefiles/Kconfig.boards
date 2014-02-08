@@ -1,5 +1,3 @@
-
-
 choice
         prompt "board type"
         default BOARD_ML505
