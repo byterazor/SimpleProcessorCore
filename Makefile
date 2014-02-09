@@ -9,6 +9,8 @@ ifeq ($(BOARD_TARGET), spartan3e)
 else
 ifeq ($(BOARD_TARGET), ml505)
 	UCF=UCF/ML505.ucf
+else
+	UCF=UCF/generic.ucf
 endif
 endif
 

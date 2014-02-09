@@ -6,6 +6,10 @@
 include $(MAKEFILES_PATH)/Makefile.boards
 export MAKEFILES_PATH
 
+ifndef FPGA
+	FPGA=$(CONFIG_FPGA_TYPE)
+endif
+
 # impact device number for jtag chain
 ifndef DEVICE_NR
 DEVICE_NR=$(subst ", , $(CONFIG_IMPACT_TARGET))
