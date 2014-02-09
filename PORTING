@@ -1,0 +1,14 @@
+        Very small Porting Guide for the Simple Processor Core System
+       ---------------------------------------------------------------
+       
+       
+The following steps are required to port the SPC to another FPGA board.
+
+1. make menuconfig
+2. deselect <use evaluation board>
+3. put in the fpga type as required by the xilinx tool chain
+4. add which number the fpga has in the boards jtag chain
+5. now you can make changes to the src/top_generic.vhd and UCF/generic.ucf files
+6. if everything is working fine, copy top_generic.vhd to top_<short_boardname>.vhd and generic.ucf to short_boardname.ucf
+7. commit your changes with good log messages to git and make your git repository available 
+8. send me a pull request and i will merge your changes into the main spc repository and add everything to kconfig
