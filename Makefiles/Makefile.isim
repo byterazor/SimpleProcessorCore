@@ -3,7 +3,7 @@ CLEAN_FILES+=isim.exe
 CLEAN_FILES+=fuse.xmsgs fuseRelaunch.cmd isim
 
 
-isim.prj: $(VHDL_SRC) $(VHDL_PKG) $(VERILOG_SRC) 
+isim.prj: $(VHDL_SRC) $(VHDL_PKG) $(VHDL_TB) $(VERILOG_SRC) 
 	@sleep 1
 	@echo "**** Creating Xilinx Project file  $@****"
 	@if [ -e $@ ]; then rm $@; fi
@@ -12,6 +12,8 @@ isim.prj: $(VHDL_SRC) $(VHDL_PKG) $(VERILOG_SRC)
 	@$(foreach f,$(VHDL_SRC),echo "vhdl work $f" >> $@ ;)
 	@$(foreach f,$(VERILOG_SRC),echo "verilog work $f" >> $@ ;)
 
-
 isim.exe: isim.prj
-	@export XILINXD_LICENSE_FILE=$(XILINX_LICENSE);$(XILINX_PATH)/fuse -prj isim.prj -o isim.exe $(TB) 
+	@export XILINXD_LICENSE_FILE=$(XILINX_LICENSE);$(XILINX_PATH)/fuse -prj isim.prj -o isim.exe $(TB)
+	
+isimulate: isim.exe
+	@export XILINXD_LICENSE_FILE=$(XILINX_LICENSE); export XILINX=$(XILINX_PATH)/../../;export LD_LIBRARY_PATH=${XILINX}/lib/lin64;./isim.exe -gui 
