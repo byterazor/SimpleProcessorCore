@@ -1,6 +1,6 @@
 CLEAN_FILES+=isim.prj
 CLEAN_FILES+=isim.exe
-CLEAN_FILES+=fuse.xmsgs fuseRelaunch.cmd isim
+CLEAN_FILES+=fuse.xmsgs fuseRelaunch.cmd isim isim.wdb 
 
 
 isim.prj: $(VHDL_SRC) $(VHDL_PKG) $(VHDL_TB) $(VERILOG_SRC) 
