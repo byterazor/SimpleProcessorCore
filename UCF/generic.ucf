@@ -1,0 +1,22 @@
+NET icclk  				LOC = C9;	     # 50Mhz Clock Signal
+
+NET "icClk" TNM_NET        = "CLOCK_MAIN";
+TIMEGRP  "CLOCK_MAIN_GRP"  = "CLOCK_MAIN";
+TIMESPEC "TS_CLOCK_MAIN"   = PERIOD "CLOCK_MAIN_GRP" 20 ns HIGH 50 %;
+
+NET icreset	  			LOC = K17 | IOSTANDARD = LVTTL | PULLDOWN;		# Reset, BTN_SOUTH
+
+
+
+NET odRS232             LOC = "M14" | IOSTANDARD = LVTTL ;
+NET idRS232             LOC = "R7" | IOSTANDARD = LVTTL ;
+
+
+#NET odLED<7>                LOC="F9" | IOSTANDARD = LVTTL;
+#NET odLED<6>                LOC="E9" | IOSTANDARD = LVTTL;
+#NET odLED<5>                LOC="D11" | IOSTANDARD = LVTTL;
+#NET odLED<4>                LOC="C11" | IOSTANDARD = LVTTL;
+#NET odLED<3>                LOC="F11" | IOSTANDARD = LVTTL;
+#NET odLED<2>                LOC="E11" | IOSTANDARD = LVTTL;
+#NET odLED<1>                LOC="E12" | IOSTANDARD = LVTTL;
+#NET odLED<0>                LOC="F12" | IOSTANDARD = LVTTL;
