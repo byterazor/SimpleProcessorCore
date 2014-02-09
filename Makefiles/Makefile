@@ -131,3 +131,4 @@ include $(MAKEFILES_PATH)/Makefile.configure
 include $(MAKEFILES_PATH)/Makefile.synth
 include $(MAKEFILES_PATH)/Makefile.Modelsim
 include $(MAKEFILES_PATH)/Makefile.isim
+include $(MAKEFILES_PATH)/Makefile.doxygen

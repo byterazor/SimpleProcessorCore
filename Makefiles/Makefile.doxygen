@@ -1,0 +1,8 @@
+CLEAN_FILES+=doc/html doc/man
+
+
+doxygen.doxyfile:
+	@echo "Missing doxygen configuration file \"doxygen.doxyfile\""
+
+doxygen: doxygen.doxyfile
+	@doxygen doxygen.doxyfile
