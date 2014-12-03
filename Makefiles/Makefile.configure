@@ -9,8 +9,8 @@
 
 KCONFIG_SUBDIR	:= kconfig/
 
-.config:
-	$(MAKEFILES_PATH)$(KCONFIG_SUBDIR)conf $(MAKEFILES_PATH)Kconfig
+.config: 
+	@touch .config	
 
 .PHONY: kconfig_clean
 kconfig_clean:
