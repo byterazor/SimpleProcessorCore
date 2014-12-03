@@ -39,7 +39,7 @@ architecture arch of top is
     signal scReset  :   std_logic;	
 begin   
 
-    scReset <= not icReset;
+    scReset <= not icReset_n;
     
      soc0:entity work.SOC
      generic map(

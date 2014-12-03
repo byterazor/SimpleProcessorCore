@@ -387,7 +387,10 @@ for my $i (@instructions) {
 for my $i (@instructions) {
 	if ($ARGV[1] eq "-vhdl") {
 	   printf("%4s \t => B\"%.32b\", --%s\n ",$i->{addr}, $i->{opc}, $i->{comment});	
-	} else {
+	} 
+    elsif($ARGV[1] eq "-raw") {
+        printf("%.32b\n",$i->{opc});
+    }else {
 	   printf( "%4s %.32b #%s\n", $i->{addr}, $i->{opc}, $i->{comment} );
 	}
 }

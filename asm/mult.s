@@ -9,4 +9,5 @@ sub $5, $5, $4
 jpz end
 jmp loop
 end:
+sto $3, 5000
 hlt
