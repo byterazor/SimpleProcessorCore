@@ -19,11 +19,12 @@ kconfig_clean:
 .PHONY: config
 config: $(MAKEFILES_PATH)$(KCONFIG_SUBDIR)conf Kconfig
 	$(MAKEFILES_PATH)$(KCONFIG_SUBDIR)conf $(MAKEFILES_PATH)Kconfig
+	-@rm Make.sources
 
 .PHONY: menuconfig
 menuconfig: $(MAKEFILES_PATH)$(KCONFIG_SUBDIR)mconf Kconfig
 	$(MAKEFILES_PATH)$(KCONFIG_SUBDIR)mconf $(MAKEFILES_PATH)Kconfig
-
+	-@rm Make.sources
 
 
 ## recursive make calls to kconfig subdir for building the executables
